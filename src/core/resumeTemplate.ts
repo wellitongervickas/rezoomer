@@ -45,6 +45,7 @@ const RESUME_CSS = `
   @media print {
     body  { font-size: 10pt; }
     .resume { padding: 0; max-width: 100%; }
+
     h2  { break-after: avoid; }
     ul, p { orphans: 3; widows: 3; }
     @page {
@@ -58,9 +59,9 @@ const RESUME_CSS = `
 
 export function buildResumeHtml(bodyHtml: string): string {
   const indented = bodyHtml
-    .split('\n')
+    .split("\n")
     .map((l) => `    ${l}`)
-    .join('\n');
+    .join("\n");
 
   return `<!DOCTYPE html>
 <html lang="en">
