@@ -6,7 +6,8 @@
 ![TypeScript Strict](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen)
 
-<!-- TODO: Add screenshot of the side panel showing a generated resume -->
+<img width="465" height="346" alt="image" src="https://github.com/user-attachments/assets/cb5c41b6-f5f9-4109-9092-af49e754895b" />
+
 
 ## What is Rezoomer?
 
