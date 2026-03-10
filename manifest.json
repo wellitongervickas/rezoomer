@@ -13,8 +13,6 @@
     "default_path": "src/ui/sidepanel/index.html"
   },
 
-  "options_page": "src/ui/options/index.html",
-
   "background": {
     "service_worker": "service-worker.js",
     "type": "classic"

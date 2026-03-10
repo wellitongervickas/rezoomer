@@ -19,7 +19,7 @@ Works on **Chrome 116+** and **Brave**.
 
 ## Why Rezoomer?
 
-- **Privacy-first** — All sensitive data encrypted at rest with AES-GCM-256. Your master key lives in memory only and is never persisted.
+- **Privacy-first** — All sensitive data encrypted at rest with AES-GCM-256. Your master key lives in memory only and is never written to disk.
 - **No backend** — Zero server infrastructure. The extension talks directly to OpenAI from your browser.
 - **Honest AI** — Three-step pipeline (analyze job, match skills, generate) that reframes your experience but never fabricates it.
 - **Clean architecture** — Domain-driven, SOLID principles, easily extensible to other AI providers.
@@ -78,13 +78,13 @@ Then load the extension:
 
 ## Getting Started
 
-1. **Create your vault** — Click the Rezoomer icon in the toolbar and set a master password (8+ characters). This creates the encrypted vault.
+1. **Create your vault** — Click the Rezoomer icon in the toolbar to open the side panel, then set a master password (8+ characters). This creates the encrypted vault.
 
-2. **Add your API key** — Open the Options page and paste your OpenAI API key. It gets encrypted immediately with your vault key.
+2. **Add your API key** — Go to the **Settings** tab in the side panel and paste your OpenAI API key. It gets encrypted immediately with your vault key.
 
-3. **Add a base resume** — Still in Options, add one or more base resumes in Markdown format. These are your "master" resumes that will be tailored.
+3. **Add a base resume** — Still in Settings, add one or more base resumes in Markdown format. These are your "master" resumes that will be tailored.
 
-4. **Generate a tailored resume** — Open the Side Panel, paste a job description, select a base resume, and click **Generate**. Watch the three-step pipeline stream the result in real time.
+4. **Generate a tailored resume** — Switch to the **Generate** tab, paste a job description, select a base resume, and click **Generate**. Watch the three-step pipeline stream the result in real time.
 
 5. **Export** — Review the tailored resume in the preview, then export to PDF or copy the Markdown.
 
@@ -106,13 +106,13 @@ UI (React)  →  messaging.ts  →  Service Worker  →  messageRouter
 
 | Directory    | Responsibility                                                                          | Key Files                                              |
 | ------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `core/`      | Types, errors, prompts, markdown rendering                                              | `types.ts`, `errors.ts`, `prompts.ts`                  |
+| `core/`      | Types, errors, prompts, markdown rendering, resume print template                       | `types.ts`, `errors.ts`, `prompts.ts`, `markdown.ts`, `resumeTemplate.ts` |
 | `agents/`    | Message routing (discriminated union dispatch), resume agent (3-step pipeline)          | `messageRouter.ts`, `resumeAgent.ts`                   |
 | `vault/`     | Encryption at rest: PBKDF2 key derivation, AES-GCM-256 encrypt/decrypt, vault lifecycle | `vault.ts`, `keyDerivation.ts`, `encryption.ts`        |
 | `storage/`   | IndexedDB schema and resume repository                                                  | `db.ts`, `resumeRepo.ts`                               |
 | `ai/`        | AI provider adapters                                                                    | `openai.ts`                                            |
 | `extension/` | MV3 glue: service worker, DI container, export service                                  | `serviceWorker.ts`, `container.ts`, `exportService.ts` |
-| `ui/`        | React components for popup, side panel, options page                                    | `popup/`, `sidepanel/`, `options/`, `shared/`          |
+| `ui/`        | React side panel (Generate, History, Settings tabs), reusable settings components, shared utils | `sidepanel/`, `options/`, `shared/`                    |
 
 ### Design Decisions
 
@@ -126,7 +126,7 @@ UI (React)  →  messaging.ts  →  Service Worker  →  messageRouter
 | Layer                       | Detail                                                                                                                                  |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
 | **Encryption at rest**      | All sensitive data (API keys, base resumes, settings) encrypted with AES-GCM-256. Key derived via PBKDF2 (600,000 iterations, SHA-256). |
-| **CryptoKey lifecycle**     | Derived on vault unlock, held in service worker memory, discarded on lock or extension restart. Never written to storage.               |
+| **CryptoKey lifecycle**     | Derived on vault unlock, held in service worker memory, discarded on lock or browser close. Auto-restored across service worker restarts via `chrome.storage.session` (memory-only, never persisted to disk). |
 | **Content Security Policy** | `script-src 'self'`; `connect-src` limited to `self` and `https://api.openai.com`.                                                      |
 | **XSS prevention**          | All Markdown-generated HTML sanitized through DOMPurify before DOM insertion.                                                           |
 | **Minimal permissions**     | `sidePanel`, `storage`, `activeTab`. Single host permission: `https://api.openai.com/*`.                                                |
@@ -155,10 +155,9 @@ src/
 ├── extension/     # Service worker, DI container, export service
 ├── storage/       # IndexedDB schema + resume repository
 ├── ui/
-│   ├── popup/     # Vault unlock + quick actions
-│   ├── sidepanel/ # Main app (Generate + History tabs)
-│   ├── options/   # Base resume + API key management
-│   └── shared/    # Hooks, messaging client, shared styles
+│   ├── sidepanel/ # Main app (Generate, History, Settings tabs)
+│   ├── options/   # Reusable settings components (API keys, base resumes)
+│   └── shared/    # Hooks, messaging client, markdown export, shared styles
 └── vault/         # PBKDF2 key derivation + AES-GCM encryption
 ```
 

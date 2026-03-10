@@ -77,9 +77,7 @@ export default defineConfig({
     modulePreload: false,
     rollupOptions: {
       input: {
-        popup: resolve(__dirname, 'src/ui/popup/index.html'),
         sidepanel: resolve(__dirname, 'src/ui/sidepanel/index.html'),
-        options: resolve(__dirname, 'src/ui/options/index.html'),
       },
       output: {
         entryFileNames: 'assets/[name]-[hash].js',

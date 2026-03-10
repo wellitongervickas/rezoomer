@@ -22,9 +22,9 @@ describe('buildResumeHtml', () => {
     expect(html).toContain('<title>Resume</title>');
   });
 
-  it('uses custom title when provided', () => {
-    const html = buildResumeHtml('<p>content</p>', 'Senior Engineer');
-    expect(html).toContain('<title>Senior Engineer</title>');
+  it('always uses "Resume" as title', () => {
+    const html = buildResumeHtml('<p>content</p>');
+    expect(html).toContain('<title>Resume</title>');
   });
 
   it('includes print media styles', () => {
