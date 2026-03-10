@@ -39,6 +39,9 @@ const RESUME_CSS = `
   strong { font-weight: 600; }
   em     { font-style: italic; }
 
+  a { color: #1a1a1a; text-decoration: none; }
+  a[href]::after { content: " (" attr(href) ")"; font-size: 0.9em; color: #555; }
+
   @media print {
     body  { font-size: 10pt; }
     .resume { padding: 0; max-width: 100%; }
@@ -47,11 +50,13 @@ const RESUME_CSS = `
     @page {
       size: A4;
       margin: 20mm 18mm;
+      margin-top: 10mm;
+      margin-bottom: 10mm;
     }
   }
 `.trim();
 
-export function buildResumeHtml(bodyHtml: string, title = 'Resume'): string {
+export function buildResumeHtml(bodyHtml: string): string {
   const indented = bodyHtml
     .split('\n')
     .map((l) => `    ${l}`)
@@ -62,7 +67,7 @@ export function buildResumeHtml(bodyHtml: string, title = 'Resume'): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${title}</title>
+  <title>Resume</title>
   <style>
 ${RESUME_CSS}
   </style>

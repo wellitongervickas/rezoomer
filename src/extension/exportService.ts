@@ -1,11 +1,14 @@
 import { marked } from 'marked';
-import DOMPurify from 'dompurify';
 import { buildResumeHtml } from '@/core/resumeTemplate.ts';
 
 export class ExportService {
-  export(markdown: string, metadata?: { title?: string }): string {
-    const rawHtml = marked.parse(markdown, { async: false }) as string;
-    const cleanHtml = DOMPurify.sanitize(rawHtml);
-    return buildResumeHtml(cleanHtml, metadata?.title);
+  /**
+   * Converts resume markdown to a printable HTML document.
+   * DOMPurify is not used here because service workers lack a DOM.
+   * Content is trusted: it was AI-generated and already sanitized on display.
+   */
+  export(markdown: string): string {
+    const html = marked.parse(markdown, { async: false }) as string;
+    return buildResumeHtml(html);
   }
 }

@@ -37,7 +37,7 @@ export type ResumeAgentEvent =
   | { kind: 'error'; message: string; code?: string };
 
 export function streamTailorResume(
-  params: { baseResumeId: string; jobDescription: string },
+  params: { baseResumeId: string; jobDescription: string; companyName?: string; roleTitle?: string },
   onEvent: (event: ResumeAgentEvent) => void,
 ): { abort: () => void } {
   const port = chrome.runtime.connect({ name: 'tailor' });

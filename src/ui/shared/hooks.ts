@@ -50,7 +50,14 @@ export function useVaultStatus() {
     }
   }, []);
 
-  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => {
+    refresh();
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [refresh]);
 
   const unlock = useCallback(async (password: string) => {
     await sendMessage({ type: 'VAULT_UNLOCK', password });

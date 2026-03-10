@@ -6,8 +6,7 @@
   "minimum_chrome_version": "116",
 
   "action": {
-    "default_popup": "src/ui/popup/index.html",
-    "default_title": "Rezoomer"
+    "default_title": "Rezoomer – Toggle Side Panel"
   },
 
   "side_panel": {

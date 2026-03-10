@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MarkdownViewer } from '../shared/MarkdownViewer.tsx';
-import { sendMessage } from '../shared/messaging.ts';
+import { renderMarkdownToHtml } from '../shared/exportHtml.ts';
 import type { TailoredResume } from '@/core/types.ts';
 
 interface Props {
@@ -23,29 +23,22 @@ export function ResumePreview({ resume, onBack }: Props) {
 
   const { companyName, roleTitle } = resume.jobDescription;
 
-  async function handleExportPdf() {
+  function handleExportPdf() {
     setExportLoading(true);
     setExportError(null);
     try {
-      const response = await sendMessage({ type: 'EXPORT_PDF', tailoredResumeId: resume.id });
-      if (!response.success || !response.data) {
-        throw new Error(response.success ? 'No data returned' : response.error);
-      }
+      const html = renderMarkdownToHtml(resume.content);
 
-      const { dataUrl } = response.data as { dataUrl: string };
       const printWindow = window.open('', '_blank');
       if (!printWindow) {
         throw new Error('Pop-up blocked. Please allow pop-ups for this extension.');
       }
 
-      const html = decodeURIComponent(escape(atob(dataUrl.split(',')[1])));
       printWindow.document.open();
       printWindow.document.write(html);
       printWindow.document.close();
-      printWindow.addEventListener('load', () => {
-        printWindow.focus();
-        printWindow.print();
-      });
+      printWindow.focus();
+      printWindow.print();
     } catch (err) {
       setExportError(err instanceof Error ? err.message : 'Export failed');
     } finally {

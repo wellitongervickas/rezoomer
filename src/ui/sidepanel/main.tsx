@@ -11,13 +11,15 @@ import { TailoringProgress } from './TailoringProgress.tsx';
 import type { TailoringStep } from './TailoringProgress.tsx';
 import { ResumePreview } from './ResumePreview.tsx';
 import { HistoryList } from './HistoryList.tsx';
+import { ApiKeyManager } from '../options/ApiKeyManager.tsx';
+import { BaseResumeManager } from '../options/BaseResumeManager.tsx';
 import type { TailoredResume } from '@/core/types.ts';
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 
-type Tab = 'generate' | 'history';
+type Tab = 'generate' | 'history' | 'settings';
 
 type GeneratePhase =
   | { kind: 'idle' }
@@ -171,15 +173,15 @@ function App() {
   function handleGenerate(
     baseResumeId: string,
     jobDescription: string,
-    _company: string,
-    _role: string,
+    company: string,
+    role: string,
   ) {
     dispatch({ type: 'GENERATING_START' });
 
     let accumulated = '';
 
     const handle = streamTailorResume(
-      { baseResumeId, jobDescription },
+      { baseResumeId, jobDescription, companyName: company, roleTitle: role },
       (event: ResumeAgentEvent) => {
         switch (event.kind) {
           case 'step':
@@ -233,11 +235,18 @@ function App() {
         </button>
         <button
           type="button"
-          className="tab-bar__lock"
+          className={`tab-bar__tab${tab === 'settings' ? ' tab-bar__tab--active' : ''}`}
+          onClick={() => dispatch({ type: 'SET_TAB', tab: 'settings' })}
+        >
+          Settings
+        </button>
+        <button
+          type="button"
+          className="tab-bar__icon"
           title="Lock vault"
           onClick={() => vault.lock()}
         >
-          🔒
+          &#128274;
         </button>
       </nav>
 
@@ -276,6 +285,19 @@ function App() {
               />
             )}
           </>
+        )}
+
+        {tab === 'settings' && (
+          <div className="settings-panel">
+            <section className="settings-section">
+              <h3 className="settings-section__title">API Keys</h3>
+              <ApiKeyManager vaultUnlocked />
+            </section>
+            <section className="settings-section">
+              <h3 className="settings-section__title">Base Resumes</h3>
+              <BaseResumeManager />
+            </section>
+          </div>
         )}
       </main>
     </div>

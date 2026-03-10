@@ -70,7 +70,7 @@ body {
   border-bottom-color: var(--color-primary);
 }
 
-.tab-bar__lock {
+.tab-bar__icon {
   background: none;
   border: none;
   cursor: pointer;
@@ -80,8 +80,23 @@ body {
   transition: opacity var(--transition-fast);
 }
 
-.tab-bar__lock:hover {
+.tab-bar__icon:hover {
   opacity: 1;
+}
+
+/* ── Settings panel ────────────────────────────────────── */
+
+.settings-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-section__title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--color-text);
 }
 
 /* ── Job description input ──────────────────────────────── */

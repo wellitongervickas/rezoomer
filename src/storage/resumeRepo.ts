@@ -42,7 +42,7 @@ export class IndexedDBResumeRepo implements IResumeRepository {
     const index = db.transaction('tailoredResumes').store.index('by-created');
 
     const results: TailoredResume[] = [];
-    const skip = page * pageSize;
+    const skip = (page - 1) * pageSize;
     let skipped = 0;
 
     let cursor = await index.openCursor(null, 'prev');

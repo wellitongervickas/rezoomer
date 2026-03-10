@@ -73,6 +73,7 @@ export function createMessageRouter(
             await container.vault.initialize(message.password);
           }
           container.sessionKey = await container.vault.unlock(message.password);
+          await chrome.storage.session.set({ vaultPassword: message.password });
           return ok();
         } catch (err) {
           return handleError(err);
@@ -81,6 +82,7 @@ export function createMessageRouter(
 
       case 'VAULT_LOCK': {
         container.sessionKey = null;
+        await chrome.storage.session.remove('vaultPassword');
         return ok();
       }
 
@@ -278,9 +280,7 @@ export function createMessageRouter(
             throw new AppError('RESUME_NOT_FOUND', `Resume with id "${message.tailoredResumeId}" was not found.`);
           }
 
-          const html = container.exporter.export(resume.content, {
-            title: resume.jobDescription.roleTitle,
-          });
+          const html = container.exporter.export(resume.content);
 
           const base64 = btoa(unescape(encodeURIComponent(html)));
           const dataUrl = `data:text/html;base64,${base64}`;
