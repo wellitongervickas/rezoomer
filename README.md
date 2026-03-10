@@ -62,8 +62,8 @@ Uses `marked` for Markdown-to-HTML conversion with `DOMPurify` sanitization. XSS
 ```bash
 git clone https://github.com/wellitongervickas/rezoomer.git
 cd rezoomer
-npm install
-npm run build
+pnpm install
+pnpm build
 ```
 
 Then load the extension:
@@ -166,14 +166,14 @@ src/
 ### Prerequisites
 
 - Node.js 18+
-- npm
+- pnpm
 
 ### Commands
 
 | Command         | Description                                                                 |
 | --------------- | --------------------------------------------------------------------------- |
-| `npm run dev`   | Vite dev server (for UI iteration; use unpacked extension for full testing) |
-| `npm run build` | Production build to `dist/`                                                 |
+| `pnpm dev`   | Vite dev server (for UI iteration; use unpacked extension for full testing) |
+| `pnpm build` | Production build to `dist/`                                                 |
 
 After building, load `dist/` as an unpacked extension in `chrome://extensions` with Developer mode enabled.
 
