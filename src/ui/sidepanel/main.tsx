@@ -1,4 +1,5 @@
-import React, { StrictMode, useReducer, useState } from 'react';
+import type React from 'react';
+import { StrictMode, useReducer, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
@@ -148,7 +149,7 @@ function App() {
   const vault = useVaultStatus();
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   const [unlockError, setUnlockError] = useState<string | null>(null);
-  const abortRef = React.useRef<{ abort: () => void } | null>(null);
+  const abortRef = useRef<{ abort: () => void } | null>(null);
 
   if (vault.loading) {
     return <div className="app-loading">Loading…</div>;
