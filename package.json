@@ -2,6 +2,30 @@
   "name": "rezoomer",
   "private": true,
   "type": "module",
+  "version": "0.1.0",
+  "author": "Welliton Gervickas <wellitongervickas@gmail.com>",
+  "license": "MIT",
+  "homepage": "https://github.com/wellitongervickas/rezoomer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wellitongervickas/rezoomer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wellitongervickas/rezoomer/issues"
+  },
+  "keywords": [
+    "resume",
+    "tailoring",
+    "ai",
+    "browser extension"
+  ],
+  "contributors": [
+    {
+      "name": "Welliton Gervickas",
+      "email": "wellitongervickas@gmail.com",
+      "url": "https://github.com/wellitongervickas"
+    }
+  ],
   "scripts": {
     "dev": "vite",
     "build": "vite build",

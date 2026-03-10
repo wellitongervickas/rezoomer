@@ -27,9 +27,11 @@ Works on **Chrome 116+** and **Brave**.
 ## Features
 
 ### Encrypted Vault
+
 PBKDF2 key derivation (600,000 iterations, SHA-256) + AES-GCM-256 encryption. Your API keys and base resumes are encrypted before they ever touch storage.
 
 ### Three-Step Resume Agent
+
 1. **Analyze** — Extracts skills, seniority, keywords, and domain from the job description
 2. **Match** — Maps your experience against the job requirements
 3. **Generate** — Produces a tailored Markdown resume emphasizing relevant experience
@@ -37,15 +39,19 @@ PBKDF2 key derivation (600,000 iterations, SHA-256) + AES-GCM-256 encryption. Yo
 Streaming output with real-time progress indicators for each step.
 
 ### Resume History
+
 Every generated resume is stored in IndexedDB and browseable from the History tab.
 
 ### PDF Export
+
 Zero-dependency export via `window.print()` with clean HTML rendering from Markdown.
 
 ### Safe Markdown Rendering
+
 Uses `marked` for Markdown-to-HTML conversion with `DOMPurify` sanitization. XSS-safe by design.
 
 ### Pluggable AI Providers
+
 `IAIProvider` interface with `AsyncIterable<string>` streaming. OpenAI (GPT-4o) ships by default — implement the interface to add your own provider.
 
 ## Installation
@@ -53,7 +59,7 @@ Uses `marked` for Markdown-to-HTML conversion with `DOMPurify` sanitization. XSS
 ### From Source
 
 ```bash
-git clone https://github.com/<owner>/rezoomer.git
+git clone https://github.com/wellitongervickas/rezoomer.git
 cd rezoomer
 npm install
 npm run build
@@ -97,15 +103,15 @@ UI (React)  →  messaging.ts  →  Service Worker  →  messageRouter
 
 ### Domain Layers
 
-| Directory | Responsibility | Key Files |
-|-----------|---------------|-----------|
-| `core/` | Types, errors, prompts, markdown rendering | `types.ts`, `errors.ts`, `prompts.ts` |
-| `agents/` | Message routing (discriminated union dispatch), resume agent (3-step pipeline) | `messageRouter.ts`, `resumeAgent.ts` |
-| `vault/` | Encryption at rest: PBKDF2 key derivation, AES-GCM-256 encrypt/decrypt, vault lifecycle | `vault.ts`, `keyDerivation.ts`, `encryption.ts` |
-| `storage/` | IndexedDB schema and resume repository | `db.ts`, `resumeRepo.ts` |
-| `ai/` | AI provider adapters | `openai.ts` |
-| `extension/` | MV3 glue: service worker, DI container, export service | `serviceWorker.ts`, `container.ts`, `exportService.ts` |
-| `ui/` | React components for popup, side panel, options page | `popup/`, `sidepanel/`, `options/`, `shared/` |
+| Directory    | Responsibility                                                                          | Key Files                                              |
+| ------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `core/`      | Types, errors, prompts, markdown rendering                                              | `types.ts`, `errors.ts`, `prompts.ts`                  |
+| `agents/`    | Message routing (discriminated union dispatch), resume agent (3-step pipeline)          | `messageRouter.ts`, `resumeAgent.ts`                   |
+| `vault/`     | Encryption at rest: PBKDF2 key derivation, AES-GCM-256 encrypt/decrypt, vault lifecycle | `vault.ts`, `keyDerivation.ts`, `encryption.ts`        |
+| `storage/`   | IndexedDB schema and resume repository                                                  | `db.ts`, `resumeRepo.ts`                               |
+| `ai/`        | AI provider adapters                                                                    | `openai.ts`                                            |
+| `extension/` | MV3 glue: service worker, DI container, export service                                  | `serviceWorker.ts`, `container.ts`, `exportService.ts` |
+| `ui/`        | React components for popup, side panel, options page                                    | `popup/`, `sidepanel/`, `options/`, `shared/`          |
 
 ### Design Decisions
 
@@ -116,27 +122,27 @@ UI (React)  →  messaging.ts  →  Service Worker  →  messageRouter
 
 ## Security
 
-| Layer | Detail |
-|-------|--------|
-| **Encryption at rest** | All sensitive data (API keys, base resumes, settings) encrypted with AES-GCM-256. Key derived via PBKDF2 (600,000 iterations, SHA-256). |
-| **CryptoKey lifecycle** | Derived on vault unlock, held in service worker memory, discarded on lock or extension restart. Never written to storage. |
-| **Content Security Policy** | `script-src 'self'`; `connect-src` limited to `self` and `https://api.openai.com`. |
-| **XSS prevention** | All Markdown-generated HTML sanitized through DOMPurify before DOM insertion. |
-| **Minimal permissions** | `sidePanel`, `storage`, `activeTab`. Single host permission: `https://api.openai.com/*`. |
-| **What leaves the browser** | Only the OpenAI API call (resume text + job description). No telemetry, no analytics, no third-party requests. |
+| Layer                       | Detail                                                                                                                                  |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Encryption at rest**      | All sensitive data (API keys, base resumes, settings) encrypted with AES-GCM-256. Key derived via PBKDF2 (600,000 iterations, SHA-256). |
+| **CryptoKey lifecycle**     | Derived on vault unlock, held in service worker memory, discarded on lock or extension restart. Never written to storage.               |
+| **Content Security Policy** | `script-src 'self'`; `connect-src` limited to `self` and `https://api.openai.com`.                                                      |
+| **XSS prevention**          | All Markdown-generated HTML sanitized through DOMPurify before DOM insertion.                                                           |
+| **Minimal permissions**     | `sidePanel`, `storage`, `activeTab`. Single host permission: `https://api.openai.com/*`.                                                |
+| **What leaves the browser** | Only the OpenAI API call (resume text + job description). No telemetry, no analytics, no third-party requests.                          |
 
 ## Tech Stack
 
-| Category | Tool |
-|----------|------|
-| Language | TypeScript (strict mode) |
-| UI | React 18 |
-| Build | Vite 6 |
-| Storage | IndexedDB via `idb` 8 |
-| Markdown | `marked` 17 |
-| Sanitization | `DOMPurify` 3 |
-| Encryption | WebCrypto API (native) |
-| AI | OpenAI Chat Completions (streaming) |
+| Category     | Tool                                |
+| ------------ | ----------------------------------- |
+| Language     | TypeScript (strict mode)            |
+| UI           | React 18                            |
+| Build        | Vite 6                              |
+| Storage      | IndexedDB via `idb` 8               |
+| Markdown     | `marked` 17                         |
+| Sanitization | `DOMPurify` 3                       |
+| Encryption   | WebCrypto API (native)              |
+| AI           | OpenAI Chat Completions (streaming) |
 
 ## Project Structure
 
@@ -164,10 +170,10 @@ src/
 
 ### Commands
 
-| Command | Description |
-|---------|-------------|
-| `npm run dev` | Vite dev server (for UI iteration; use unpacked extension for full testing) |
-| `npm run build` | Production build to `dist/` |
+| Command         | Description                                                                 |
+| --------------- | --------------------------------------------------------------------------- |
+| `npm run dev`   | Vite dev server (for UI iteration; use unpacked extension for full testing) |
+| `npm run build` | Production build to `dist/`                                                 |
 
 After building, load `dist/` as an unpacked extension in `chrome://extensions` with Developer mode enabled.
 
