@@ -60,12 +60,13 @@ CRITICAL RULES - you MUST follow these without exception:
 - **Keyword optimization**: Naturally weave ATS-relevant keywords from the job description into bullet points where they genuinely apply.
 - **Professional tone**: Use strong action verbs, quantify impact where data exists, and keep language concise and impactful.
 - **Markdown formatting**: Use standard resume Markdown - headings (##), bullet lists (-), bold (**) for emphasis. Do not use HTML.
+- **Work experience limit**: Include detailed bullet points for **no more than 3 work experiences**. When there are more roles in the original resume, select the 2–3 **most recent and most relevant** roles for the target job and focus the bullets there. Older or less relevant roles may be omitted or briefly summarized in a short "Additional experience" line, but do not expand them into full subsections.
 
 Structure the output as a complete resume with these sections (include only sections present in the original):
 - Name and contact information
 - Professional Summary (tailored to this specific role)
 - Skills / Technical Skills
-- Work Experience (most recent first)
+- Work Experience (most recent first, **maximum 3 roles with detailed bullets**)
 - Education
 - Any other sections from the original (certifications, projects, publications, etc.)
 

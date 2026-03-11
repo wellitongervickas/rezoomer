@@ -8,7 +8,6 @@
 
 <img width="465" height="346" alt="image" src="https://github.com/user-attachments/assets/cb5c41b6-f5f9-4109-9092-af49e754895b" />
 
-
 ## What is Rezoomer?
 
 Rezoomer is a browser extension that tailors your resume to any job description using AI. Paste a job posting, select your base resume, and get a tailored version in seconds — with streaming output so you can watch it being written.
@@ -104,15 +103,15 @@ UI (React)  →  messaging.ts  →  Service Worker  →  messageRouter
 
 ### Domain Layers
 
-| Directory    | Responsibility                                                                          | Key Files                                              |
-| ------------ | --------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| `core/`      | Types, errors, prompts, markdown rendering, resume print template                       | `types.ts`, `errors.ts`, `prompts.ts`, `markdown.ts`, `resumeTemplate.ts` |
-| `agents/`    | Message routing (discriminated union dispatch), resume agent (3-step pipeline)          | `messageRouter.ts`, `resumeAgent.ts`                   |
-| `vault/`     | Encryption at rest: PBKDF2 key derivation, AES-GCM-256 encrypt/decrypt, vault lifecycle | `vault.ts`, `keyDerivation.ts`, `encryption.ts`        |
-| `storage/`   | IndexedDB schema and resume repository                                                  | `db.ts`, `resumeRepo.ts`                               |
-| `ai/`        | AI provider adapters                                                                    | `openai.ts`                                            |
-| `extension/` | MV3 glue: service worker, DI container, export service                                  | `serviceWorker.ts`, `container.ts`, `exportService.ts` |
-| `ui/`        | React side panel (Generate, History, Settings tabs), reusable settings components, shared utils | `sidepanel/`, `options/`, `shared/`                    |
+| Directory    | Responsibility                                                                                  | Key Files                                                                 |
+| ------------ | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `core/`      | Types, errors, prompts, markdown rendering, resume print template                               | `types.ts`, `errors.ts`, `prompts.ts`, `markdown.ts`, `resumeTemplate.ts` |
+| `agents/`    | Message routing (discriminated union dispatch), resume agent (3-step pipeline)                  | `messageRouter.ts`, `resumeAgent.ts`                                      |
+| `vault/`     | Encryption at rest: PBKDF2 key derivation, AES-GCM-256 encrypt/decrypt, vault lifecycle         | `vault.ts`, `keyDerivation.ts`, `encryption.ts`                           |
+| `storage/`   | IndexedDB schema and resume repository                                                          | `db.ts`, `resumeRepo.ts`                                                  |
+| `ai/`        | AI provider adapters                                                                            | `openai.ts`                                                               |
+| `extension/` | MV3 glue: service worker, DI container, export service                                          | `serviceWorker.ts`, `container.ts`, `exportService.ts`                    |
+| `ui/`        | React side panel (Generate, History, Settings tabs), reusable settings components, shared utils | `sidepanel/`, `options/`, `shared/`                                       |
 
 ### Design Decisions
 
@@ -123,14 +122,14 @@ UI (React)  →  messaging.ts  →  Service Worker  →  messageRouter
 
 ## Security
 
-| Layer                       | Detail                                                                                                                                  |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| **Encryption at rest**      | All sensitive data (API keys, base resumes, settings) encrypted with AES-GCM-256. Key derived via PBKDF2 (600,000 iterations, SHA-256). |
+| Layer                       | Detail                                                                                                                                                                                                        |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Encryption at rest**      | All sensitive data (API keys, base resumes, settings) encrypted with AES-GCM-256. Key derived via PBKDF2 (600,000 iterations, SHA-256).                                                                       |
 | **CryptoKey lifecycle**     | Derived on vault unlock, held in service worker memory, discarded on lock or browser close. Auto-restored across service worker restarts via `chrome.storage.session` (memory-only, never persisted to disk). |
-| **Content Security Policy** | `script-src 'self'`; `connect-src` limited to `self` and `https://api.openai.com`.                                                      |
-| **XSS prevention**          | All Markdown-generated HTML sanitized through DOMPurify before DOM insertion.                                                           |
-| **Minimal permissions**     | `sidePanel`, `storage`, `activeTab`. Single host permission: `https://api.openai.com/*`.                                                |
-| **What leaves the browser** | Only the OpenAI API call (resume text + job description). No telemetry, no analytics, no third-party requests.                          |
+| **Content Security Policy** | `script-src 'self'`; `connect-src` limited to `self` and `https://api.openai.com`.                                                                                                                            |
+| **XSS prevention**          | All Markdown-generated HTML sanitized through DOMPurify before DOM insertion.                                                                                                                                 |
+| **Minimal permissions**     | `sidePanel`, `storage`, `activeTab`. Single host permission: `https://api.openai.com/*`.                                                                                                                      |
+| **What leaves the browser** | Only the OpenAI API call (resume text + job description). No telemetry, no analytics, no third-party requests.                                                                                                |
 
 ## Tech Stack
 
@@ -170,8 +169,8 @@ src/
 
 ### Commands
 
-| Command         | Description                                                                 |
-| --------------- | --------------------------------------------------------------------------- |
+| Command      | Description                                                                 |
+| ------------ | --------------------------------------------------------------------------- |
 | `pnpm dev`   | Vite dev server (for UI iteration; use unpacked extension for full testing) |
 | `pnpm build` | Production build to `dist/`                                                 |
 
