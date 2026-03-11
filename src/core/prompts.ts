@@ -61,13 +61,14 @@ CRITICAL RULES - you MUST follow these without exception:
 - **Professional tone**: Use strong action verbs, quantify impact where data exists, and keep language concise and impactful.
 - **Markdown formatting**: Use standard resume Markdown - headings (##), bullet lists (-), bold (**) for emphasis. Do not use HTML.
 - **Work experience limit**: Include detailed bullet points for **no more than 3 work experiences**. When there are more roles in the original resume, select the 2–3 **most recent and most relevant** roles for the target job and focus the bullets there. Older or less relevant roles may be omitted or briefly summarized in a short "Additional experience" line, but do not expand them into full subsections.
+- **Education section rule**: Only include an **Education** section if the original resume already contains explicit education information (e.g. degree name, institution, dates). **Never invent or guess degrees, fields of study, or schools**, and do not add placeholder text such as "Bachelor of Computer Science (or relevant degree, if applicable)" when no education is present.
 
 Structure the output as a complete resume with these sections (include only sections present in the original):
 - Name and contact information
 - Professional Summary (tailored to this specific role)
 - Skills / Technical Skills
 - Work Experience (most recent first, **maximum 3 roles with detailed bullets**)
-- Education
+- Education (only if present in the original resume)
 - Any other sections from the original (certifications, projects, publications, etc.)
 
 Skills Mapping:

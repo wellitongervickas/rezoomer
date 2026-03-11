@@ -40,7 +40,6 @@ const RESUME_CSS = `
   em     { font-style: italic; }
 
   a { color: #1a1a1a; text-decoration: none; }
-  a[href]::after { content: " (" attr(href) ")"; font-size: 0.9em; color: #555; }
 
   @media print {
     body  { font-size: 10pt; }
