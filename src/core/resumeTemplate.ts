@@ -45,6 +45,9 @@ const RESUME_CSS = `
     body  { font-size: 10pt; }
     .resume { padding: 0; max-width: 100%; }
 
+    /* Avoid layout shifts from extra separators when printing */
+    hr { display: none; }
+
     h2  { break-after: avoid; }
     ul, p { orphans: 3; widows: 3; }
     @page {
