@@ -1,4 +1,5 @@
-export const ANALYZE_PROMPT = (jobDescription: string): string => `
+export const ANALYZE_PROMPT = (jobDescription: string): string =>
+  `
 You are an expert technical recruiter and career coach. Your task is to deeply analyze a job description and extract structured information.
 
 Analyze the following job description and produce a structured output covering:
@@ -20,7 +21,8 @@ ${jobDescription}
 Respond with a well-structured analysis using the sections above.
 `.trim();
 
-export const MATCH_PROMPT = (analysis: string, resumeContent: string): string => `
+export const MATCH_PROMPT = (analysis: string, resumeContent: string): string =>
+  `
 You are an expert resume strategist. You have a structured job analysis and a candidate's base resume. Your task is to produce a detailed skills and experience mapping.
 
 For each requirement identified in the analysis, determine:
@@ -50,7 +52,8 @@ export const GENERATE_PROMPT = (
   matchResult: string,
   resumeContent: string,
   jobDescription: string,
-): string => `
+): string =>
+  `
 You are an expert resume writer. Using the skills mapping and the original resume, rewrite the resume in clean Markdown, tailored to the target job description.
 
 CRITICAL RULES - you MUST follow these without exception:
@@ -68,7 +71,7 @@ Structure the output as a complete resume with these sections (include only sect
 - Name and contact information
 - Professional Summary (tailored to this specific role)
 - Skills / Technical Skills
-- Work Experience (most recent first, **maximum 3 roles with detailed bullets**)
+- Work Experience (most recent first, **maximum 3 roles with detailed bullets**) + Additional Experiences
 - Education (only if present in the original resume)
 - Any other sections from the original (certifications, projects, publications, etc.)
 
