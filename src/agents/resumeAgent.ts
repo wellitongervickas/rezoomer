@@ -1,4 +1,4 @@
-import type { IAIProvider } from '@/core/types.ts';
+import type { GenerationOptions, IAIProvider } from '@/core/types.ts';
 import { ANALYZE_PROMPT, MATCH_PROMPT, GENERATE_PROMPT } from '@/core/prompts.ts';
 
 // ---------------------------------------------------------------------------
@@ -22,7 +22,7 @@ export class ResumeAgent {
   async *tailor(
     resumeText: string,
     jobDescription: string,
-    options?: { signal?: AbortSignal },
+    options?: { signal?: AbortSignal; options?: GenerationOptions },
   ): AsyncIterable<ResumeAgentEvent> {
     const aiOpts = { signal: options?.signal, temperature: 0 };
 
@@ -49,7 +49,12 @@ export class ResumeAgent {
     const chunks: string[] = [];
 
     for await (const token of this.ai.generateCompletion(
-      [{ role: 'user', content: GENERATE_PROMPT(matchResult, resumeText, jobDescription) }],
+      [
+        {
+          role: 'user',
+          content: GENERATE_PROMPT(matchResult, resumeText, jobDescription, options?.options),
+        },
+      ],
       aiOpts,
     )) {
       chunks.push(token);

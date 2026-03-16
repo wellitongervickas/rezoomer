@@ -48,12 +48,54 @@ ${resumeContent}
 Produce a thorough mapping that will guide the resume rewrite. Do not fabricate experience - only map what exists.
 `.trim();
 
+import type { GenerationOptions } from './types.ts';
+
 export const GENERATE_PROMPT = (
   matchResult: string,
   resumeContent: string,
   jobDescription: string,
-): string =>
-  `
+  generationOptions?: GenerationOptions,
+): string => {
+  const audienceInstruction =
+    generationOptions?.audience === 'ats'
+      ? '- **Audience**: Prioritize ATS optimization and keyword coverage while keeping the text readable for humans.'
+      : generationOptions?.audience === 'hr'
+        ? '- **Audience**: Optimize primarily for human recruiters and hiring managers. Clarity and honesty are more important than keyword density.'
+        : '- **Audience**: Balance ATS optimization with readability for human recruiters.';
+
+  const experienceLimitInstruction =
+    typeof generationOptions?.maxKeyExperiences === 'number'
+      ? `- **Work experience limit**: Include detailed bullet points for **no more than ${generationOptions.maxKeyExperiences} work experiences**. When there are more roles in the original resume, select the most recent and most relevant roles for the target job and focus the bullets there.`
+      : '- **Work experience limit**: Include detailed bullet points for **no more than 3 work experiences**. When there are more roles in the original resume, select the 2–3 most recent and most relevant roles for the target job and focus the bullets there.';
+
+  const additionalExperienceInstruction =
+    generationOptions?.includeAdditionalExperience === false
+      ? '- **Additional experience**: You may omit or very briefly mention older or less relevant roles, but do **not** include a separate "Additional experience" section.'
+      : '- **Additional experience**: Older or less relevant roles may be omitted or briefly summarized in a short "Additional experience" line, but do not expand them into full subsections.';
+
+  const localeInstructions = [
+    generationOptions?.targetCountry
+      ? `- **Target country**: Use tone and examples that feel appropriate for roles in **${generationOptions.targetCountry}**.`
+      : null,
+    generationOptions?.targetLanguage
+      ? `- **Language**: Write the entire resume in **${generationOptions.targetLanguage}**.`
+      : null,
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const rulesInstruction =
+    generationOptions?.rules && generationOptions.rules.trim().length > 0
+      ? `\nAdditional custom rules and preferences from the candidate (these must never cause fabrication of skills or experience, only reframing of what is already true):\n${generationOptions.rules.trim()}\n`
+      : '';
+
+  const honestyGuardrails = `
+Honesty and non-exaggeration rules:
+- **Do not overstate skills**: If the job description emphasizes a technology, platform, or domain where the candidate only has light or adjacent exposure, describe it as **familiarity** or **willingness to learn**, not as deep expertise.
+- **Respect gaps**: When the skills mapping identifies a gap, you may not turn that into a claimed skill. At most, you may highlight adjacent experience that shows the candidate can learn it.
+- **No inflated seniority**: Do not upgrade job titles or imply a higher level of ownership than is supported by the original resume.`;
+
+  return `
 You are an expert resume writer. Using the skills mapping and the original resume, rewrite the resume in clean Markdown, tailored to the target job description.
 
 CRITICAL RULES - you MUST follow these without exception:
@@ -63,7 +105,12 @@ CRITICAL RULES - you MUST follow these without exception:
 - **Keyword optimization**: Naturally weave ATS-relevant keywords from the job description into bullet points where they genuinely apply.
 - **Professional tone**: Use strong action verbs, quantify impact where data exists, and keep language concise and impactful.
 - **Markdown formatting**: Use standard resume Markdown - headings (##), bullet lists (-), bold (**) for emphasis. Do not use HTML.
-- **Work experience limit**: Include detailed bullet points for **no more than 3 work experiences**. When there are more roles in the original resume, select the 2–3 **most recent and most relevant** roles for the target job and focus the bullets there. Older or less relevant roles may be omitted or briefly summarized in a short "Additional experience" line, but do not expand them into full subsections.
+${audienceInstruction}
+${experienceLimitInstruction}
+${additionalExperienceInstruction}
+${honestyGuardrails}
+
+${localeInstructions}
 - **Education section rule**: Only include an **Education** section if the original resume already contains explicit education information (e.g. degree name, institution, dates). **Never invent or guess degrees, fields of study, or schools**, and do not add placeholder text such as "Bachelor of Computer Science (or relevant degree, if applicable)" when no education is present.
 - **Relevance filter**: Strongly prioritize skills, technologies, tools, and projects that are directly relevant to the job analysis and description. It is acceptable to **omit or very briefly mention** technologies, domains, or projects that are clearly unrelated to the target role (for example, niche blockchain / NFT / crypto work when applying to a purely web / SaaS role). Do not highlight unrelated items as primary strengths or dedicate standalone project sections to them unless the job description explicitly calls for them.
 
@@ -91,4 +138,5 @@ ${jobDescription}
 ---
 
 Output only the final Markdown resume. Do not include explanations, commentary, or preamble.
-`.trim();
+${rulesInstruction}`.trim();
+}

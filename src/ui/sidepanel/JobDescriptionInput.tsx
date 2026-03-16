@@ -1,20 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import { sendMessage } from '../shared/messaging.ts';
-import type { BaseResume } from '@/core/types.ts';
+import type { BaseResume, GenerationOptions, ResumeAudience } from '@/core/types.ts';
 
 interface Props {
-  onGenerate: (baseResumeId: string, jobDescription: string, company: string, role: string) => void;
+  onGenerate: (
+    baseResumeId: string,
+    jobDescription: string,
+    company: string,
+    role: string,
+    options: GenerationOptions,
+  ) => void;
   isGenerating: boolean;
+  initialOptions: GenerationOptions;
+  onOptionsChange?: (options: GenerationOptions) => void;
 }
 
-export function JobDescriptionInput({ onGenerate, isGenerating }: Props) {
+export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, onOptionsChange }: Props) {
   const [baseResumes, setBaseResumes] = useState<BaseResume[]>([]);
   const [selectedResumeId, setSelectedResumeId] = useState('');
   const [jobDescription, setJobDescription] = useState('');
   const [company, setCompany] = useState('');
   const [role, setRole] = useState('');
+  const [audience, setAudience] = useState<ResumeAudience>(initialOptions.audience);
+  const [maxKeyExperiences, setMaxKeyExperiences] = useState<string>(
+    initialOptions.maxKeyExperiences != null ? String(initialOptions.maxKeyExperiences) : '',
+  );
+  const [includeAdditionalExperience, setIncludeAdditionalExperience] = useState(
+    initialOptions.includeAdditionalExperience,
+  );
+  const [targetCountry, setTargetCountry] = useState(initialOptions.targetCountry ?? '');
+  const [targetLanguage, setTargetLanguage] = useState(initialOptions.targetLanguage ?? '');
+  const [rules, setRules] = useState(initialOptions.rules);
   const [loadingResumes, setLoadingResumes] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setAudience(initialOptions.audience);
+    setMaxKeyExperiences(
+      initialOptions.maxKeyExperiences != null ? String(initialOptions.maxKeyExperiences) : '',
+    );
+    setIncludeAdditionalExperience(initialOptions.includeAdditionalExperience);
+    setTargetCountry(initialOptions.targetCountry ?? '');
+    setTargetLanguage(initialOptions.targetLanguage ?? '');
+    setRules(initialOptions.rules);
+  }, [initialOptions]);
 
   useEffect(() => {
     let cancelled = false;
@@ -44,8 +73,32 @@ export function JobDescriptionInput({ onGenerate, isGenerating }: Props) {
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canGenerate) return;
-    onGenerate(selectedResumeId, jobDescription.trim(), company.trim(), role.trim());
+    const options = buildOptions();
+
+    onGenerate(selectedResumeId, jobDescription.trim(), company.trim(), role.trim(), options);
   }
+
+  function buildOptions(): GenerationOptions {
+    const parsedMax =
+      maxKeyExperiences.trim() === '' || Number.isNaN(Number(maxKeyExperiences))
+        ? null
+        : Number(maxKeyExperiences);
+
+    return {
+      audience,
+      maxKeyExperiences: parsedMax,
+      includeAdditionalExperience,
+      targetCountry: targetCountry.trim() === '' ? null : targetCountry.trim(),
+      targetLanguage: targetLanguage.trim() === '' ? null : targetLanguage.trim(),
+      rules: rules.trim(),
+    };
+  }
+
+  useEffect(() => {
+    if (!onOptionsChange) return;
+    onOptionsChange(buildOptions());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [audience, maxKeyExperiences, includeAdditionalExperience, targetCountry, targetLanguage, rules]);
 
   return (
     <form className="jd-input" onSubmit={handleSubmit}>
@@ -76,6 +129,128 @@ export function JobDescriptionInput({ onGenerate, isGenerating }: Props) {
           </select>
         )}
       </div>
+
+      <details className="form-advanced">
+        <summary className="form-advanced__summary">Advanced options</summary>
+        <div className="form-advanced__content">
+          <div className="form-group">
+            <span className="form-label">Primary audience</span>
+            <div className="form-radio-group">
+              <label className="form-radio">
+                <input
+                  type="radio"
+                  name="audience"
+                  value="ats"
+                  checked={audience === 'ats'}
+                  onChange={() => setAudience('ats')}
+                  disabled={isGenerating}
+                />
+                <span>ATS-focused</span>
+              </label>
+              <label className="form-radio">
+                <input
+                  type="radio"
+                  name="audience"
+                  value="hr"
+                  checked={audience === 'hr'}
+                  onChange={() => setAudience('hr')}
+                  disabled={isGenerating}
+                />
+                <span>HR / recruiter</span>
+              </label>
+              <label className="form-radio">
+                <input
+                  type="radio"
+                  name="audience"
+                  value="both"
+                  checked={audience === 'both'}
+                  onChange={() => setAudience('both')}
+                  disabled={isGenerating}
+                />
+                <span>Both ATS and HR</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="form-group form-group--inline">
+            <div>
+              <label className="form-label" htmlFor="max-experiences-input">
+                Max key experiences
+              </label>
+              <input
+                id="max-experiences-input"
+                type="number"
+                min={1}
+                max={6}
+                className="form-input form-input--sm"
+                placeholder="3"
+                value={maxKeyExperiences}
+                onChange={(e) => setMaxKeyExperiences(e.target.value)}
+                disabled={isGenerating}
+              />
+            </div>
+            <label className="form-checkbox">
+              <input
+                type="checkbox"
+                checked={includeAdditionalExperience}
+                onChange={(e) => setIncludeAdditionalExperience(e.target.checked)}
+                disabled={isGenerating}
+              />
+              <span>Show additional experience summary</span>
+            </label>
+          </div>
+
+          <div className="form-group form-group--inline">
+            <div>
+              <label className="form-label" htmlFor="target-country-input">
+                Target country
+              </label>
+              <input
+                id="target-country-input"
+                type="text"
+                className="form-input"
+                placeholder="e.g. United States, Germany"
+                value={targetCountry}
+                onChange={(e) => setTargetCountry(e.target.value)}
+                disabled={isGenerating}
+              />
+            </div>
+            <div>
+              <label className="form-label" htmlFor="target-language-input">
+                Target language
+              </label>
+              <input
+                id="target-language-input"
+                type="text"
+                className="form-input"
+                placeholder="e.g. English, Portuguese"
+                value={targetLanguage}
+                onChange={(e) => setTargetLanguage(e.target.value)}
+                disabled={isGenerating}
+              />
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="rules-textarea">
+              Custom rules & emphasis
+            </label>
+            <textarea
+              id="rules-textarea"
+              className="form-textarea"
+              rows={4}
+              placeholder="Examples: downplay AWS and highlight GCP; mention I am still learning Kubernetes; avoid overstating blockchain experience."
+              value={rules}
+              onChange={(e) => setRules(e.target.value)}
+              disabled={isGenerating}
+            />
+            <p className="form-hint">
+              These instructions will be passed directly to the AI to control tone and emphasis. They should never cause
+              fabrication of skills or experience.
+            </p>
+          </div>
+        </div>
+      </details>
 
       <div className="form-group">
         <label className="form-label" htmlFor="company-input">

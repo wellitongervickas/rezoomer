@@ -26,6 +26,17 @@ export interface JobDescription {
   readonly roleTitle?: string;
 }
 
+export type ResumeAudience = 'ats' | 'hr' | 'both';
+
+export interface GenerationOptions {
+  readonly audience: ResumeAudience;
+  readonly maxKeyExperiences: number | null;
+  readonly includeAdditionalExperience: boolean;
+  readonly targetCountry: string | null;
+  readonly targetLanguage: string | null;
+  readonly rules: string;
+}
+
 export interface AIProviderConfig {
   readonly id: string;
   readonly name: string;
@@ -57,6 +68,7 @@ export interface VaultSettings {
   readonly theme: 'light' | 'dark' | 'system';
   readonly defaultProviderId: string;
   readonly exportFormat: 'pdf' | 'markdown';
+  readonly generationDefaults?: GenerationOptions;
 }
 
 export const DEFAULT_VAULT_SETTINGS: VaultSettings = {
@@ -64,6 +76,14 @@ export const DEFAULT_VAULT_SETTINGS: VaultSettings = {
   theme: 'system',
   defaultProviderId: 'openai-gpt-4o',
   exportFormat: 'pdf',
+  generationDefaults: {
+    audience: 'both',
+    maxKeyExperiences: 3,
+    includeAdditionalExperience: true,
+    targetCountry: null,
+    targetLanguage: null,
+    rules: '',
+  },
 };
 
 // ---------------------------------------------------------------------------

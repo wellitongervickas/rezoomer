@@ -1,7 +1,7 @@
 import { createContainer } from './container.ts';
 import { createMessageRouter } from '@/agents/messageRouter.ts';
 import { AppError } from '@/core/errors.ts';
-import { DEFAULT_PROVIDERS } from '@/core/types.ts';
+import { DEFAULT_PROVIDERS, type GenerationOptions } from '@/core/types.ts';
 
 const container = createContainer();
 const handleMessage = createMessageRouter(container);
@@ -36,7 +36,13 @@ chrome.runtime.onConnect.addListener((port) => {
   const abort = new AbortController();
   port.onDisconnect.addListener(() => abort.abort());
 
-  port.onMessage.addListener(async (msg: { baseResumeId: string; jobDescription: string; companyName?: string; roleTitle?: string }) => {
+  port.onMessage.addListener(async (msg: {
+    baseResumeId: string;
+    jobDescription: string;
+    companyName?: string;
+    roleTitle?: string;
+    options?: GenerationOptions;
+  }) => {
     await sessionReady;
     try {
       if (container.sessionKey === null) {
@@ -55,7 +61,7 @@ chrome.runtime.onConnect.addListener((port) => {
       for await (const event of container.resumeAgent.tailor(
         baseResume.content,
         msg.jobDescription,
-        { signal: abort.signal },
+        { signal: abort.signal, options: msg.options },
       )) {
         if (event.kind === 'done') {
           tailoredContent = event.content;

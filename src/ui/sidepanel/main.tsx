@@ -1,5 +1,5 @@
 import type React from 'react';
-import { StrictMode, useReducer, useRef, useState } from 'react';
+import { StrictMode, useEffect, useReducer, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 
@@ -13,7 +13,8 @@ import { ResumePreview } from './ResumePreview.tsx';
 import { HistoryList } from './HistoryList.tsx';
 import { ApiKeyManager } from '../options/ApiKeyManager.tsx';
 import { BaseResumeManager } from '../options/BaseResumeManager.tsx';
-import type { TailoredResume } from '@/core/types.ts';
+import type { TailoredResume, GenerationOptions, VaultSettings } from '@/core/types.ts';
+import { DEFAULT_VAULT_SETTINGS } from '@/core/types.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -152,6 +153,9 @@ function App() {
   const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
   const [unlockError, setUnlockError] = useState<string | null>(null);
   const abortRef = useRef<{ abort: () => void } | null>(null);
+  const [settings, setSettings] = useState<VaultSettings | null>(null);
+  const [generationDefaults, setGenerationDefaults] = useState<GenerationOptions | null>(null);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
 
   if (vault.loading) {
     return <div className="app-loading">Loading…</div>;
@@ -170,18 +174,51 @@ function App() {
     return <UnlockForm onUnlock={handleUnlock} error={unlockError} />;
   }
 
+  useEffect(() => {
+    if (!vault.unlocked || settingsLoaded) return;
+
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const loaded = await sendMessage<VaultSettings | null>({ type: 'GET_SETTINGS' });
+        if (cancelled) return;
+
+        const effectiveSettings: VaultSettings =
+          loaded ?? DEFAULT_VAULT_SETTINGS;
+
+        const genDefaults: GenerationOptions =
+          effectiveSettings.generationDefaults ?? DEFAULT_VAULT_SETTINGS.generationDefaults!;
+
+        setSettings(effectiveSettings);
+        setGenerationDefaults(genDefaults);
+      } catch {
+        // If settings cannot be loaded, fall back to defaults.
+        setSettings(DEFAULT_VAULT_SETTINGS);
+        setGenerationDefaults(DEFAULT_VAULT_SETTINGS.generationDefaults!);
+      } finally {
+        if (!cancelled) setSettingsLoaded(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [vault.unlocked, settingsLoaded]);
+
   function handleGenerate(
     baseResumeId: string,
     jobDescription: string,
     company: string,
     role: string,
+    options: GenerationOptions,
   ) {
     dispatch({ type: 'GENERATING_START' });
 
     let accumulated = '';
 
     const handle = streamTailorResume(
-      { baseResumeId, jobDescription, companyName: company, roleTitle: role },
+      { baseResumeId, jobDescription, companyName: company, roleTitle: role, options },
       (event: ResumeAgentEvent) => {
         switch (event.kind) {
           case 'step':
@@ -227,6 +264,25 @@ function App() {
     );
   }
 
+  async function handleGenerationOptionsChange(options: GenerationOptions) {
+    setGenerationDefaults(options);
+
+    if (!settings) return;
+
+    const nextSettings: VaultSettings = {
+      ...settings,
+      generationDefaults: options,
+    };
+
+    setSettings(nextSettings);
+
+    try {
+      await sendMessage<void>({ type: 'SAVE_SETTINGS', settings: nextSettings });
+    } catch {
+      // Persist failure is non-fatal for the UI; user can still generate.
+    }
+  }
+
   return (
     <div className="app">
       <nav className="tab-bar">
@@ -265,7 +321,12 @@ function App() {
         {tab === 'generate' && (
           <>
             {generatePhase.kind === 'idle' && (
-              <JobDescriptionInput onGenerate={handleGenerate} isGenerating={false} />
+              <JobDescriptionInput
+                onGenerate={handleGenerate}
+                isGenerating={false}
+                initialOptions={generationDefaults ?? DEFAULT_VAULT_SETTINGS.generationDefaults!}
+                onOptionsChange={handleGenerationOptionsChange}
+              />
             )}
             {generatePhase.kind === 'generating' && (
               <TailoringProgress

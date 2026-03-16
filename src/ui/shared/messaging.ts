@@ -1,4 +1,4 @@
-import type { TailoredResume } from '@/core/types.ts';
+import type { GenerationOptions, TailoredResume } from '@/core/types.ts';
 
 export type ExtensionMessage =
   | { type: 'VAULT_UNLOCK'; password: string }
@@ -37,7 +37,13 @@ export type ResumeAgentEvent =
   | { kind: 'error'; message: string; code?: string };
 
 export function streamTailorResume(
-  params: { baseResumeId: string; jobDescription: string; companyName?: string; roleTitle?: string },
+  params: {
+    baseResumeId: string;
+    jobDescription: string;
+    companyName?: string;
+    roleTitle?: string;
+    options?: GenerationOptions;
+  },
   onEvent: (event: ResumeAgentEvent) => void,
 ): { abort: () => void } {
   const port = chrome.runtime.connect({ name: 'tailor' });
