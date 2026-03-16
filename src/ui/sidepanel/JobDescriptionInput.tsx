@@ -1,6 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { sendMessage } from '../shared/messaging.ts';
-import type { BaseResume, GenerationOptions, ResumeAudience } from '@/core/types.ts';
+import React, { useState, useEffect } from "react";
+import { sendMessage } from "../shared/messaging.ts";
+import type {
+  BaseResume,
+  GenerationOptions,
+  ResumeAudience,
+} from "@/core/types.ts";
 
 interface Props {
   onGenerate: (
@@ -15,21 +19,33 @@ interface Props {
   onOptionsChange?: (options: GenerationOptions) => void;
 }
 
-export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, onOptionsChange }: Props) {
+export function JobDescriptionInput({
+  onGenerate,
+  isGenerating,
+  initialOptions,
+  onOptionsChange,
+}: Props) {
   const [baseResumes, setBaseResumes] = useState<BaseResume[]>([]);
-  const [selectedResumeId, setSelectedResumeId] = useState('');
-  const [jobDescription, setJobDescription] = useState('');
-  const [company, setCompany] = useState('');
-  const [role, setRole] = useState('');
-  const [audience, setAudience] = useState<ResumeAudience>(initialOptions.audience);
+  const [selectedResumeId, setSelectedResumeId] = useState("");
+  const [jobDescription, setJobDescription] = useState("");
+  const [company, setCompany] = useState("");
+  const [role, setRole] = useState("");
+  const [audience, setAudience] = useState<ResumeAudience>(
+    initialOptions.audience,
+  );
   const [maxKeyExperiences, setMaxKeyExperiences] = useState<string>(
-    initialOptions.maxKeyExperiences != null ? String(initialOptions.maxKeyExperiences) : '',
+    initialOptions.maxKeyExperiences != null
+      ? String(initialOptions.maxKeyExperiences)
+      : "",
   );
-  const [includeAdditionalExperience, setIncludeAdditionalExperience] = useState(
-    initialOptions.includeAdditionalExperience,
+  const [includeAdditionalExperience, setIncludeAdditionalExperience] =
+    useState(initialOptions.includeAdditionalExperience);
+  const [targetCountry, setTargetCountry] = useState(
+    initialOptions.targetCountry ?? "",
   );
-  const [targetCountry, setTargetCountry] = useState(initialOptions.targetCountry ?? '');
-  const [targetLanguage, setTargetLanguage] = useState(initialOptions.targetLanguage ?? '');
+  const [targetLanguage, setTargetLanguage] = useState(
+    initialOptions.targetLanguage ?? "",
+  );
   const [rules, setRules] = useState(initialOptions.rules);
   const [loadingResumes, setLoadingResumes] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -37,11 +53,13 @@ export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, 
   useEffect(() => {
     setAudience(initialOptions.audience);
     setMaxKeyExperiences(
-      initialOptions.maxKeyExperiences != null ? String(initialOptions.maxKeyExperiences) : '',
+      initialOptions.maxKeyExperiences != null
+        ? String(initialOptions.maxKeyExperiences)
+        : "",
     );
     setIncludeAdditionalExperience(initialOptions.includeAdditionalExperience);
-    setTargetCountry(initialOptions.targetCountry ?? '');
-    setTargetLanguage(initialOptions.targetLanguage ?? '');
+    setTargetCountry(initialOptions.targetCountry ?? "");
+    setTargetLanguage(initialOptions.targetLanguage ?? "");
     setRules(initialOptions.rules);
   }, [initialOptions]);
 
@@ -49,7 +67,7 @@ export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, 
     let cancelled = false;
     setLoadingResumes(true);
     setFetchError(null);
-    sendMessage<BaseResume[]>({ type: 'GET_BASE_RESUMES' })
+    sendMessage<BaseResume[]>({ type: "GET_BASE_RESUMES" })
       .then((data) => {
         if (!cancelled) {
           setBaseResumes(data);
@@ -57,30 +75,33 @@ export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, 
         }
       })
       .catch((err) => {
-        if (!cancelled) setFetchError(err instanceof Error ? err.message : 'Failed to load resumes');
+        if (!cancelled)
+          setFetchError(
+            err instanceof Error ? err.message : "Failed to load resumes",
+          );
       })
       .finally(() => {
         if (!cancelled) setLoadingResumes(false);
       });
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const canGenerate =
-    !isGenerating &&
-    selectedResumeId.trim() !== '' &&
-    jobDescription.trim() !== '';
+    !isGenerating && selectedResumeId !== "" && jobDescription !== "";
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canGenerate) return;
     const options = buildOptions();
 
-    onGenerate(selectedResumeId, jobDescription.trim(), company.trim(), role.trim(), options);
+    onGenerate(selectedResumeId, jobDescription, company, role, options);
   }
 
   function buildOptions(): GenerationOptions {
     const parsedMax =
-      maxKeyExperiences.trim() === '' || Number.isNaN(Number(maxKeyExperiences))
+      maxKeyExperiences === "" || Number.isNaN(Number(maxKeyExperiences))
         ? null
         : Number(maxKeyExperiences);
 
@@ -88,9 +109,9 @@ export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, 
       audience,
       maxKeyExperiences: parsedMax,
       includeAdditionalExperience,
-      targetCountry: targetCountry.trim() === '' ? null : targetCountry.trim(),
-      targetLanguage: targetLanguage.trim() === '' ? null : targetLanguage.trim(),
-      rules: rules.trim(),
+      targetCountry: targetCountry === "" ? null : targetCountry,
+      targetLanguage: targetLanguage === "" ? null : targetLanguage,
+      rules: rules,
     };
   }
 
@@ -98,7 +119,14 @@ export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, 
     if (!onOptionsChange) return;
     onOptionsChange(buildOptions());
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [audience, maxKeyExperiences, includeAdditionalExperience, targetCountry, targetLanguage, rules]);
+  }, [
+    audience,
+    maxKeyExperiences,
+    includeAdditionalExperience,
+    targetCountry,
+    targetLanguage,
+    rules,
+  ]);
 
   return (
     <form className="jd-input" onSubmit={handleSubmit}>
@@ -111,7 +139,9 @@ export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, 
         ) : fetchError ? (
           <p className="form-error">{fetchError}</p>
         ) : baseResumes.length === 0 ? (
-          <p className="form-hint">No base resumes saved. Add one in the options page.</p>
+          <p className="form-hint">
+            No base resumes saved. Add one in the options page.
+          </p>
         ) : (
           <select
             id="base-resume-select"
@@ -141,8 +171,8 @@ export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, 
                   type="radio"
                   name="audience"
                   value="ats"
-                  checked={audience === 'ats'}
-                  onChange={() => setAudience('ats')}
+                  checked={audience === "ats"}
+                  onChange={() => setAudience("ats")}
                   disabled={isGenerating}
                 />
                 <span>ATS-focused</span>
@@ -152,8 +182,8 @@ export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, 
                   type="radio"
                   name="audience"
                   value="hr"
-                  checked={audience === 'hr'}
-                  onChange={() => setAudience('hr')}
+                  checked={audience === "hr"}
+                  onChange={() => setAudience("hr")}
                   disabled={isGenerating}
                 />
                 <span>HR / recruiter</span>
@@ -163,8 +193,8 @@ export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, 
                   type="radio"
                   name="audience"
                   value="both"
-                  checked={audience === 'both'}
-                  onChange={() => setAudience('both')}
+                  checked={audience === "both"}
+                  onChange={() => setAudience("both")}
                   disabled={isGenerating}
                 />
                 <span>Both ATS and HR</span>
@@ -193,7 +223,9 @@ export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, 
               <input
                 type="checkbox"
                 checked={includeAdditionalExperience}
-                onChange={(e) => setIncludeAdditionalExperience(e.target.checked)}
+                onChange={(e) =>
+                  setIncludeAdditionalExperience(e.target.checked)
+                }
                 disabled={isGenerating}
               />
               <span>Show additional experience summary</span>
@@ -245,8 +277,9 @@ export function JobDescriptionInput({ onGenerate, isGenerating, initialOptions, 
               disabled={isGenerating}
             />
             <p className="form-hint">
-              These instructions will be passed directly to the AI to control tone and emphasis. They should never cause
-              fabrication of skills or experience.
+              These instructions will be passed directly to the AI to control
+              tone and emphasis. They should never cause fabrication of skills
+              or experience.
             </p>
           </div>
         </div>
