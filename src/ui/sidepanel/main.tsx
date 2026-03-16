@@ -157,23 +157,6 @@ function App() {
   const [generationDefaults, setGenerationDefaults] = useState<GenerationOptions | null>(null);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
 
-  if (vault.loading) {
-    return <div className="app-loading">Loading…</div>;
-  }
-
-  if (!vault.unlocked) {
-    async function handleUnlock(password: string) {
-      setUnlockError(null);
-      try {
-        await vault.unlock(password);
-      } catch (err) {
-        setUnlockError(err instanceof Error ? err.message : 'Unlock failed');
-        throw err;
-      }
-    }
-    return <UnlockForm onUnlock={handleUnlock} error={unlockError} />;
-  }
-
   useEffect(() => {
     if (!vault.unlocked || settingsLoaded) return;
 
@@ -205,6 +188,23 @@ function App() {
       cancelled = true;
     };
   }, [vault.unlocked, settingsLoaded]);
+
+  if (vault.loading) {
+    return <div className="app-loading">Loading…</div>;
+  }
+
+  if (!vault.unlocked) {
+    async function handleUnlock(password: string) {
+      setUnlockError(null);
+      try {
+        await vault.unlock(password);
+      } catch (err) {
+        setUnlockError(err instanceof Error ? err.message : 'Unlock failed');
+        throw err;
+      }
+    }
+    return <UnlockForm onUnlock={handleUnlock} error={unlockError} />;
+  }
 
   function handleGenerate(
     baseResumeId: string,
@@ -261,16 +261,17 @@ function App() {
       jobDescription.rawText,
       jobDescription.companyName ?? '',
       jobDescription.roleTitle ?? '',
+      generationDefaults ?? DEFAULT_VAULT_SETTINGS.generationDefaults!,
     );
   }
 
   async function handleGenerationOptionsChange(options: GenerationOptions) {
     setGenerationDefaults(options);
 
-    if (!settings) return;
+    const baseSettings: VaultSettings = settings ?? DEFAULT_VAULT_SETTINGS;
 
     const nextSettings: VaultSettings = {
-      ...settings,
+      ...baseSettings,
       generationDefaults: options,
     };
 

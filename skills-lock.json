@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "chrome-extension-development": {
+      "source": "mindrally/skills",
+      "sourceType": "github",
+      "computedHash": "0de6cab64ca8aa87aeb89905a0b08cd5a081c68823894c6e85ae6df14a763b03"
+    },
+    "clean-architecture": {
+      "source": "pproenca/dot-skills",
+      "sourceType": "github",
+      "computedHash": "613e3421174049dfb4a528c072cafb5e805322a6d9e1522ec9b74077e07947d7"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "afeca00ac2f492d88fdd010e73d91719a5b57c564bb4a73325b0bd77e11323ab"
+    }
+  }
+}
