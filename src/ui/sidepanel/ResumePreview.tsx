@@ -6,6 +6,7 @@ import type { TailoredResume } from '@/core/types.ts';
 interface Props {
   resume: TailoredResume;
   onBack: () => void;
+  onRebuild?: () => void;
 }
 
 function formatDate(epochMs: number): string {
@@ -16,7 +17,7 @@ function formatDate(epochMs: number): string {
   });
 }
 
-export function ResumePreview({ resume, onBack }: Props) {
+export function ResumePreview({ resume, onBack, onRebuild }: Props) {
   const [exportLoading, setExportLoading] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -88,6 +89,15 @@ export function ResumePreview({ resume, onBack }: Props) {
           >
             {exportLoading ? 'Exporting…' : 'Export PDF'}
           </button>
+          {onRebuild && (
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={onRebuild}
+            >
+              Rebuild
+            </button>
+          )}
         </div>
 
         {exportError && <p className="form-error">{exportError}</p>}

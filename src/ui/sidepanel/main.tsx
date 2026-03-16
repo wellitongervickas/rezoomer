@@ -216,6 +216,17 @@ function App() {
 
   const { tab, generatePhase, selectedHistoryResume } = state;
 
+  function handleRebuildFromResume(resume: TailoredResume) {
+    const { baseResumeId, jobDescription } = resume;
+    dispatch({ type: 'SET_TAB', tab: 'generate' });
+    handleGenerate(
+      baseResumeId,
+      jobDescription.rawText,
+      jobDescription.companyName ?? '',
+      jobDescription.roleTitle ?? '',
+    );
+  }
+
   return (
     <div className="app">
       <nav className="tab-bar">
@@ -267,6 +278,7 @@ function App() {
               <ResumePreview
                 resume={generatePhase.resume}
                 onBack={() => dispatch({ type: 'GENERATING_CANCEL' })}
+                onRebuild={() => handleRebuildFromResume(generatePhase.resume)}
               />
             )}
           </>
@@ -278,6 +290,7 @@ function App() {
               <ResumePreview
                 resume={selectedHistoryResume}
                 onBack={() => dispatch({ type: 'CLEAR_HISTORY_RESUME' })}
+                onRebuild={() => handleRebuildFromResume(selectedHistoryResume)}
               />
             ) : (
               <HistoryList
