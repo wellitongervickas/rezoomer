@@ -1,4 +1,4 @@
-import type { GenerationOptions, TailoredResume } from '@/core/types.ts';
+import type { EasyApplyFields, GenerationOptions, TailoredResume } from '@/core/types.ts';
 
 export type ExtensionMessage =
   | { type: 'VAULT_UNLOCK'; password: string }
@@ -12,7 +12,9 @@ export type ExtensionMessage =
   | { type: 'GET_BASE_RESUMES' }
   | { type: 'TAILOR_RESUME'; baseResumeId: string; jobDescription: string }
   | { type: 'LIST_TAILORED'; page: number; pageSize: number }
-  | { type: 'EXPORT_PDF'; tailoredResumeId: string };
+  | { type: 'EXPORT_PDF'; tailoredResumeId: string }
+  | { type: 'SCRAPE_LINKEDIN_JOB' }
+  | { type: 'FILL_EASY_APPLY'; fields: EasyApplyFields };
 
 export type ExtensionResponse<T = unknown> =
   | { success: true; data: T }

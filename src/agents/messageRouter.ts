@@ -1,7 +1,11 @@
 import type { Container } from '@/extension/container.ts';
 import { AppError } from '@/core/errors.ts';
-import type { BaseResume, VaultSettings } from '@/core/types.ts';
+import type { BaseResume, EasyApplyFields, VaultSettings } from '@/core/types.ts';
 import { DEFAULT_PROVIDERS } from '@/core/types.ts';
+import {
+  fillEasyApplyModal,
+  scrapeLinkedInJobPage,
+} from '@/extension/linkedinScraper.ts';
 
 // ---------------------------------------------------------------------------
 // Message types
@@ -21,7 +25,9 @@ export type ExtensionMessage =
   | { type: 'LIST_TAILORED'; page: number; pageSize: number }
   | { type: 'EXPORT_PDF'; tailoredResumeId: string }
   | { type: 'SAVE_SETTINGS'; settings: VaultSettings }
-  | { type: 'GET_SETTINGS' };
+  | { type: 'GET_SETTINGS' }
+  | { type: 'SCRAPE_LINKEDIN_JOB' }
+  | { type: 'FILL_EASY_APPLY'; fields: EasyApplyFields };
 
 export type ExtensionResponse =
   | { success: true; data?: unknown }
@@ -285,6 +291,84 @@ export function createMessageRouter(
           const base64 = btoa(unescape(encodeURIComponent(html)));
           const dataUrl = `data:text/html;base64,${base64}`;
           return ok({ dataUrl });
+        } catch (err) {
+          return handleError(err);
+        }
+      }
+
+      // ----------------------------------------------------------------
+      // LinkedIn integration
+      // ----------------------------------------------------------------
+      case 'SCRAPE_LINKEDIN_JOB': {
+        try {
+          const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+          if (!tab?.id) {
+            throw new AppError('VALIDATION_ERROR', 'No active tab found.');
+          }
+
+          const url = tab.url ?? '';
+          if (!url.startsWith('https://www.linkedin.com/jobs/view/')) {
+            throw new AppError(
+              'LINKEDIN_NOT_JOB_PAGE',
+              'Navigate to a LinkedIn job listing first.',
+            );
+          }
+
+          const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: scrapeLinkedInJobPage,
+            world: 'MAIN',
+          });
+
+          const data = results[0]?.result;
+          if (!data || !data.jobDescription) {
+            throw new AppError(
+              'LINKEDIN_SCRAPE_FAILED',
+              'Could not read job details. LinkedIn may have changed its layout.',
+            );
+          }
+
+          return ok(data);
+        } catch (err) {
+          return handleError(err);
+        }
+      }
+
+      case 'FILL_EASY_APPLY': {
+        try {
+          const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+          if (!tab?.id) {
+            throw new AppError('VALIDATION_ERROR', 'No active tab found.');
+          }
+
+          const url = tab.url ?? '';
+          if (!url.startsWith('https://www.linkedin.com/')) {
+            throw new AppError(
+              'LINKEDIN_NOT_JOB_PAGE',
+              'Navigate to a LinkedIn job page first.',
+            );
+          }
+
+          const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: fillEasyApplyModal,
+            args: [message.fields],
+            world: 'MAIN',
+          });
+
+          const result = results[0]?.result;
+          if (!result) {
+            throw new AppError('EASY_APPLY_FILL_FAILED', 'Fill script returned no result.');
+          }
+
+          if (result.skippedFields.includes('modal_not_found')) {
+            throw new AppError(
+              'EASY_APPLY_NOT_FOUND',
+              'Easy Apply modal not detected. Open the modal first.',
+            );
+          }
+
+          return ok(result);
         } catch (err) {
           return handleError(err);
         }

@@ -6,7 +6,11 @@ export type ErrorCode =
   | 'PROVIDER_ERROR'
   | 'VALIDATION_ERROR'
   | 'ENCRYPTION_ERROR'
-  | 'AGENT_ERROR';
+  | 'AGENT_ERROR'
+  | 'LINKEDIN_NOT_JOB_PAGE'
+  | 'LINKEDIN_SCRAPE_FAILED'
+  | 'EASY_APPLY_NOT_FOUND'
+  | 'EASY_APPLY_FILL_FAILED';
 
 export class AppError extends Error {
   constructor(

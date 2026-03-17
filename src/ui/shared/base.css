@@ -35,6 +35,17 @@ body {
   color: var(--color-text);
 }
 
+.form-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.form-label-row .form-label {
+  margin-bottom: 0;
+}
+
 .form-optional {
   font-weight: 400;
   color: var(--color-text-muted);
