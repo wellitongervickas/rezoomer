@@ -13,8 +13,9 @@ import { ResumePreview } from './ResumePreview.tsx';
 import { HistoryList } from './HistoryList.tsx';
 import { ApiKeyManager } from '../options/ApiKeyManager.tsx';
 import { BaseResumeManager } from '../options/BaseResumeManager.tsx';
-import type { TailoredResume, GenerationOptions, VaultSettings } from '@/core/types.ts';
+import type { EasyApplyResult, LinkedInJobData, TailoredResume, GenerationOptions, VaultSettings } from '@/core/types.ts';
 import { DEFAULT_VAULT_SETTINGS } from '@/core/types.ts';
+import { parseResumeForEasyApply } from '@/extension/linkedinScraper.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -284,6 +285,15 @@ function App() {
     }
   }
 
+  async function handleImportLinkedIn(): Promise<LinkedInJobData> {
+    return sendMessage<LinkedInJobData>({ type: 'SCRAPE_LINKEDIN_JOB' });
+  }
+
+  async function handleFillEasyApply(resume: TailoredResume): Promise<EasyApplyResult> {
+    const fields = parseResumeForEasyApply(resume.content);
+    return sendMessage<EasyApplyResult>({ type: 'FILL_EASY_APPLY', fields });
+  }
+
   return (
     <div className="app">
       <nav className="tab-bar">
@@ -327,6 +337,7 @@ function App() {
                 isGenerating={false}
                 initialOptions={generationDefaults ?? DEFAULT_VAULT_SETTINGS.generationDefaults!}
                 onOptionsChange={handleGenerationOptionsChange}
+                onImportLinkedIn={handleImportLinkedIn}
               />
             )}
             {generatePhase.kind === 'generating' && (
@@ -341,6 +352,7 @@ function App() {
                 resume={generatePhase.resume}
                 onBack={() => dispatch({ type: 'GENERATING_CANCEL' })}
                 onRebuild={() => handleRebuildFromResume(generatePhase.resume)}
+                onFillEasyApply={() => handleFillEasyApply(generatePhase.resume)}
               />
             )}
           </>

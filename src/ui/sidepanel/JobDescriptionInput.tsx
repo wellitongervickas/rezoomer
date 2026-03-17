@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { sendMessage } from "../shared/messaging.ts";
 import type {
   BaseResume,
   GenerationOptions,
+  LinkedInJobData,
   ResumeAudience,
 } from "@/core/types.ts";
 
@@ -17,6 +18,7 @@ interface Props {
   isGenerating: boolean;
   initialOptions: GenerationOptions;
   onOptionsChange?: (options: GenerationOptions) => void;
+  onImportLinkedIn?: () => Promise<LinkedInJobData>;
 }
 
 export function JobDescriptionInput({
@@ -24,6 +26,7 @@ export function JobDescriptionInput({
   isGenerating,
   initialOptions,
   onOptionsChange,
+  onImportLinkedIn,
 }: Props) {
   const [baseResumes, setBaseResumes] = useState<BaseResume[]>([]);
   const [selectedResumeId, setSelectedResumeId] = useState("");
@@ -49,6 +52,9 @@ export function JobDescriptionInput({
   const [rules, setRules] = useState(initialOptions.rules);
   const [loadingResumes, setLoadingResumes] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importError, setImportError] = useState<string | null>(null);
+  const mountedRef = useRef(false);
 
   useEffect(() => {
     setAudience(initialOptions.audience);
@@ -115,7 +121,27 @@ export function JobDescriptionInput({
     };
   }
 
+  async function handleImportLinkedIn() {
+    if (!onImportLinkedIn) return;
+    setIsImporting(true);
+    setImportError(null);
+    try {
+      const data = await onImportLinkedIn();
+      setJobDescription(data.jobDescription);
+      setCompany(data.companyName);
+      setRole(data.jobTitle);
+    } catch (err) {
+      setImportError(err instanceof Error ? err.message : 'Import failed');
+    } finally {
+      setIsImporting(false);
+    }
+  }
+
   useEffect(() => {
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      return;
+    }
     if (!onOptionsChange) return;
     onOptionsChange(buildOptions());
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -316,9 +342,22 @@ export function JobDescriptionInput({
       </div>
 
       <div className="form-group">
-        <label className="form-label" htmlFor="jd-textarea">
-          Job Description <span className="form-required">*</span>
-        </label>
+        <div className="form-label-row">
+          <label className="form-label" htmlFor="jd-textarea">
+            Job Description <span className="form-required">*</span>
+          </label>
+          {onImportLinkedIn && (
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm"
+              onClick={handleImportLinkedIn}
+              disabled={isImporting || isGenerating}
+            >
+              {isImporting ? 'Importing…' : 'Import from LinkedIn'}
+            </button>
+          )}
+        </div>
+        {importError && <p className="form-error">{importError}</p>}
         <textarea
           id="jd-textarea"
           className="form-textarea"

@@ -102,6 +102,28 @@ export const DEFAULT_PROVIDERS: readonly AIProviderConfig[] = [
 ] as const;
 
 // ---------------------------------------------------------------------------
+// LinkedIn integration types
+// ---------------------------------------------------------------------------
+
+export interface LinkedInJobData {
+  readonly jobTitle: string;
+  readonly companyName: string;
+  readonly jobDescription: string;
+}
+
+export interface EasyApplyFields {
+  readonly name?: string;
+  readonly email?: string;
+  readonly phone?: string;
+  readonly coverLetter?: string;
+}
+
+export interface EasyApplyResult {
+  readonly filledCount: number;
+  readonly skippedFields: string[];
+}
+
+// ---------------------------------------------------------------------------
 // Ports (interfaces with real polymorphism value)
 // ---------------------------------------------------------------------------
 
