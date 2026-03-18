@@ -118,7 +118,7 @@ Structure the output as a complete resume with these sections (include only sect
 - Name and contact information
 - Professional Summary (tailored to this specific role)
 - Skills / Technical Skills
-- Work Experience (most recent first, **maximum 3 roles with detailed bullets**) + Additional Experiences
+- Work Experience (most recent first, **maximum ${typeof generationOptions?.maxKeyExperiences === 'number' ? generationOptions.maxKeyExperiences : 3} roles with detailed bullets**) + Additional Experiences
 - Education (only if present in the original resume)
 - Any other sections from the original (certifications, projects, publications, etc.)
 
