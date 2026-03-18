@@ -38,8 +38,8 @@ Also identify:
 - **Keyword Coverage**: Which ATS keywords from the analysis already appear in the resume, and which are missing but could be naturally incorporated. Estimate the current coverage percentage (e.g. "~45% — needs improvement").
 - **Reframing Opportunities**: Existing experiences that could be reworded to better align with the role's language and priorities.
 - **Mirror Opportunities**: List 5–8 exact ATS trigger phrases from the analysis that can be embedded verbatim and authentically into bullet points. For each phrase, identify which role or achievement in the resume it maps to (e.g. "cross-functional collaboration → maps to the 2021 platform migration project at Acme Corp").
-- **Quantification Opportunities**: For each role in the resume, flag which existing bullets are currently unquantified but could realistically have a metric added — count, percentage improvement, dollar value, time saved, team size, user scale, error reduction. Suggest the type of metric even if the exact value is unknown (e.g. "Team lead bullet at XYZ Corp — could add headcount and delivery timeline").
-- **Summary Hook**: Draft one punchy opening line for the professional summary that will be used verbatim or adapted. Format: "[Exact job title from posting] with [X years] of experience in [domain], [strongest achievement with metric]." This line must feel authentic to the candidate's real background.
+- **Quantification Opportunities**: For each role in the resume, flag which existing bullets are currently unquantified but could realistically have a metric added — count, percentage improvement, dollar value, time saved, team size, user scale, error reduction. Suggest the type of metric even if the exact value is unknown (e.g. "Team lead bullet at XYZ Corp — could add headcount and delivery timeline"). IMPORTANT: these are editorial notes to identify gaps — the generate step must NEVER insert a metric that is not explicitly stated in the original resume, even if you suggest one here.
+- **Summary Hook**: Draft one punchy opening line for the professional summary that will be used verbatim or adapted. Format: "[Exact job title from posting] with [X years] of experience in [domain], [strongest achievement with metric — ONLY if a real metric exists in the resume; otherwise use qualitative impact]." This line must feel authentic to the candidate's real background.
 
 Job Analysis:
 ---
@@ -77,7 +77,7 @@ AUDIENCE: ATS-Optimized
 Your primary goal is maximum ATS score. Every structural and wording decision must serve keyword coverage and parser compatibility.
 
 MANDATORY section order (do not deviate):
-  1. Contact Information — format as: # Full Name as an H1 heading, then one line: email | phone | LinkedIn URL (no tables, no columns, no omitting the name)
+  1. Contact Information — copy ALL contact fields from the original resume exactly. Format: # Full Name on its own line as an H1 heading, then one pipe-separated line with email, phone, and every URL present (LinkedIn, GitHub, portfolio, etc.). URLs MUST be output as bare text (e.g. linkedin.com/in/johndoe or https://github.com/johndoe). If the original resume has a URL inside a markdown link like [LinkedIn](https://linkedin.com/in/johndoe), extract and output ONLY the URL part — never output the label alone without the URL. Do NOT invent, guess, or omit any contact field that exists in the original resume. (no tables, no columns)
   2. Professional Summary
   3. Core Competencies / Technical Skills
   4. Work Experience
@@ -88,7 +88,7 @@ MANDATORY section order (do not deviate):
 Professional Summary rules:
   - MUST open with the exact job title from the posting (where truthful): "[Title] with [X] years of experience in [domain]."
   - 2–3 sentences max
-  - Sentence 2: lead with the strongest quantified achievement from the match result's Summary Hook
+  - Sentence 2: lead with the strongest achievement from the match result's Summary Hook — if the hook contains a metric not present in the original resume, replace it with qualitative language
   - Sentence 3: embed 2–3 must-have keywords naturally
   - Achievement-focused — NOT "seeking a role" or "looking to leverage"
 
@@ -117,7 +117,7 @@ AUDIENCE: Human Recruiter (HR)
 Your primary goal is to command attention in a 6-second scan and tell a compelling achievement story. Numbers and impact must be immediately visible.
 
 MANDATORY section order — experience leads for experienced candidates (do not deviate):
-  1. Contact Information — format as: # Full Name as an H1 heading, then one line: email | phone | LinkedIn URL (no tables, no columns, no omitting the name)
+  1. Contact Information — copy ALL contact fields from the original resume exactly. Format: # Full Name on its own line as an H1 heading, then one pipe-separated line with email, phone, and every URL present (LinkedIn, GitHub, portfolio, etc.). URLs MUST be output as bare text (e.g. linkedin.com/in/johndoe or https://github.com/johndoe). If the original resume has a URL inside a markdown link like [LinkedIn](https://linkedin.com/in/johndoe), extract and output ONLY the URL part — never output the label alone without the URL. Do NOT invent, guess, or omit any contact field that exists in the original resume. (no tables, no columns)
   2. Professional Summary
   3. Work Experience
   4. Skills / Core Competencies
@@ -132,7 +132,7 @@ Professional Summary rules:
   - 2–3 sentences
   - Sentence 2: domain expertise + team/scale context
   - Sentence 3: what you uniquely bring to this specific role
-  - Use the Summary Hook from the match result as your starting point
+  - Use the Summary Hook from the match result as your starting point — if the hook contains a metric not present in the original resume, replace it with qualitative language
 
 Experience bullet formula — CAR (Challenge → Action → Result, narrative-first):
   "[Strong action verb] [what you did / context of challenge], resulting in [quantified outcome]"
@@ -153,7 +153,7 @@ AUDIENCE: ATS + Human Recruiter (Balanced — default)
 Satisfy both: pass the ATS keyword scan first, then compel the human reader. These are not in conflict — keywords embedded in achievement statements serve both.
 
 MANDATORY section order (works for both ATS and HR — do not deviate):
-  1. Contact Information — format as: # Full Name as an H1 heading, then one line: email | phone | LinkedIn URL (no tables, no columns, no omitting the name)
+  1. Contact Information — copy ALL contact fields from the original resume exactly. Format: # Full Name on its own line as an H1 heading, then one pipe-separated line with email, phone, and every URL present (LinkedIn, GitHub, portfolio, etc.). URLs MUST be output as bare text (e.g. linkedin.com/in/johndoe or https://github.com/johndoe). If the original resume has a URL inside a markdown link like [LinkedIn](https://linkedin.com/in/johndoe), extract and output ONLY the URL part — never output the label alone without the URL. Do NOT invent, guess, or omit any contact field that exists in the original resume. (no tables, no columns)
   2. Professional Summary
   3. Core Competencies / Technical Skills
   4. Work Experience
@@ -165,7 +165,7 @@ Professional Summary rules:
   - Achievement-first AND keyword-rich: "[Job title from posting] with [X years] in [domain] who [achievement + metric]."
   - 2–3 sentences
   - Include: exact job title from posting + 2–3 must-have keywords + 1–2 quantified achievements
-  - Use the Summary Hook from the match result as your starting point
+  - Use the Summary Hook from the match result as your starting point — if the hook contains a metric not present in the original resume, replace it with qualitative language
 
 Core Competencies / Technical Skills rules (same as ATS):
   - 10–15 keywords, grouped by category
@@ -246,10 +246,17 @@ You are an expert resume writer with deep knowledge of ATS systems and recruiter
 CRITICAL RULES — follow without exception
 ═══════════════════════════════════════════════
 - **Always include the candidate's name**: The resume MUST start with "# Full Name" as an H1 Markdown heading. Copy the name exactly from the original resume. Never omit it, abbreviate it, or move it lower in the document.
+- **NEVER output an empty or placeholder section**: If the original resume has no data for a section (Education, Certifications, Projects, Languages, etc.), DO NOT include that section heading at all. Outputting any of the following is a critical violation — treat these as hard-banned strings:
+    ✗ "No education details provided"
+    ✗ "No certifications provided"
+    ✗ "No education information available"
+    ✗ "N/A"
+    ✗ Any section heading followed by nothing or a placeholder sentence
+  A section that cannot be filled with real data from the original resume must be completely absent from the output.
 - **Never fabricate**: Do not invent any experience, skill, project, title, date, or achievement not present in the original resume. Violations destroy candidate credibility.
 - **Reframe, don't invent**: Rephrase and reorder existing content to emphasise relevance. Incorporate job-relevant keywords only where they accurately describe existing work.
 - **Preserve all facts**: Dates, company names, job titles, and measurable achievements must remain accurate to the original.
-- **Quantify where real data exists**: Use every metric, number, and figure that is explicitly present in the original resume — revenue ($), cost savings ($), efficiency gains (%), time saved, team size, user scale, growth (%), error reduction (%). Do NOT invent, estimate, or approximate any number that is not in the original. If no metric exists for a bullet, use strong qualitative language instead (e.g. "significantly reduced", "substantially improved", "dramatically accelerated").
+- **Quantify where real data exists**: Use every metric, number, and figure that is explicitly present in the ORIGINAL RESUME — revenue ($), cost savings ($), efficiency gains (%), time saved, team size, user scale, growth (%), error reduction (%). The Skills Mapping may suggest hypothetical metrics for bullets that have none — IGNORE those suggestions entirely and do NOT use them. If no metric exists in the original resume for a bullet, use strong qualitative language instead (e.g. "significantly reduced", "substantially improved", "dramatically accelerated"). A bullet with no metric is far better than a bullet with an invented one.
 - **Achievement over responsibility**: Every bullet must show what you ACHIEVED, not what you were "responsible for". Transform: "Responsible for leading team" → "Led team of 8, delivering [X] 2 weeks ahead of schedule."
 - **Strong action verbs only**: Start every bullet with a past-tense action verb. Forbidden openers: "Responsible for", "Involved in", "Worked with", "Helped", "Assisted", "Participated in".
 - **Standard section headings** (non-standard names break ATS parsers):
@@ -259,8 +266,6 @@ CRITICAL RULES — follow without exception
     • "Education" — standard
     • "Certifications" — standard
 - **Relevance filter**: Omit or minimise skills, projects, or domains that are clearly unrelated to the target role (e.g. niche NFT/crypto work for a pure SaaS role). Do not highlight unrelated items as primary strengths.
-- **Education rule**: Only include an Education section if the original resume contains explicit education data (degree, institution, dates). If absent, omit the section header completely. Never write placeholder sentences like "No education details provided."
-- **Omit empty sections entirely**: If the original resume has no data for Education, Certifications, Projects, or any other optional section, do NOT include that section at all — not even with a placeholder or "N/A". A missing section is always better than an empty one.
 - **Markdown only**: Use ##, ###, -, ** for structure. No HTML, no tables, no columns.
 ${audienceBlock}
 ${experienceDepthBlock}
