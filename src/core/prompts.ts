@@ -237,7 +237,7 @@ Honesty and non-exaggeration rules (non-negotiable):
 - **Do not overstate skills**: If the candidate only has light or adjacent exposure to a technology, describe it as "familiarity with" or "exposure to", not deep expertise.
 - **Respect gaps**: A skills gap identified in the match result cannot be turned into a claimed skill. You may highlight adjacent experience that shows learning ability.
 - **No inflated seniority**: Do not upgrade job titles or imply higher ownership than the original resume supports.
-- **Conservative estimates only**: If you add a metric that was not in the original resume, it must be clearly an estimate, flagged with "~" (e.g. "~30% reduction in processing time"). Never present estimated metrics as exact facts.`;
+- **No invented metrics**: Only use numbers, percentages, and monetary values that are explicitly stated in the original resume. Do not estimate, approximate, or invent any metric — not even with a "~" qualifier. If a bullet has no metric in the original resume, describe the impact qualitatively with strong language (e.g. "significantly reduced latency", "substantially improved reliability") rather than guessing a number.`;
 
   return `
 You are an expert resume writer with deep knowledge of ATS systems and recruiter psychology. Using the skills mapping and the original resume, produce a complete tailored resume in clean Markdown.
@@ -245,11 +245,11 @@ You are an expert resume writer with deep knowledge of ATS systems and recruiter
 ═══════════════════════════════════════════════
 CRITICAL RULES — follow without exception
 ═══════════════════════════════════════════════
+- **Always include the candidate's name**: The resume MUST start with "# Full Name" as an H1 Markdown heading. Copy the name exactly from the original resume. Never omit it, abbreviate it, or move it lower in the document.
 - **Never fabricate**: Do not invent any experience, skill, project, title, date, or achievement not present in the original resume. Violations destroy candidate credibility.
-- **Always include the candidate's name**: The resume MUST start with # Full Name as an H1 Markdown heading. Never omit the name. Copy it exactly from the original resume.
 - **Reframe, don't invent**: Rephrase and reorder existing content to emphasise relevance. Incorporate job-relevant keywords only where they accurately describe existing work.
 - **Preserve all facts**: Dates, company names, job titles, and measurable achievements must remain accurate to the original.
-- **Quantify aggressively**: Every bullet that CAN have a number MUST have one. Use the quantification opportunities from the match analysis. Metric types: revenue ($), cost savings ($), efficiency gains (%), time saved, scale (users/accounts/team size), growth (%), error reduction (%). Flag estimates with "~". NEVER leave a bullet with zero concrete outcome.
+- **Quantify where real data exists**: Use every metric, number, and figure that is explicitly present in the original resume — revenue ($), cost savings ($), efficiency gains (%), time saved, team size, user scale, growth (%), error reduction (%). Do NOT invent, estimate, or approximate any number that is not in the original. If no metric exists for a bullet, use strong qualitative language instead (e.g. "significantly reduced", "substantially improved", "dramatically accelerated").
 - **Achievement over responsibility**: Every bullet must show what you ACHIEVED, not what you were "responsible for". Transform: "Responsible for leading team" → "Led team of 8, delivering [X] 2 weeks ahead of schedule."
 - **Strong action verbs only**: Start every bullet with a past-tense action verb. Forbidden openers: "Responsible for", "Involved in", "Worked with", "Helped", "Assisted", "Participated in".
 - **Standard section headings** (non-standard names break ATS parsers):
@@ -259,7 +259,8 @@ CRITICAL RULES — follow without exception
     • "Education" — standard
     • "Certifications" — standard
 - **Relevance filter**: Omit or minimise skills, projects, or domains that are clearly unrelated to the target role (e.g. niche NFT/crypto work for a pure SaaS role). Do not highlight unrelated items as primary strengths.
-- **Education rule**: Only include Education if the original resume already contains explicit education info (degree, institution, dates). Never invent or guess degrees.
+- **Education rule**: Only include an Education section if the original resume contains explicit education data (degree, institution, dates). If absent, omit the section header completely. Never write placeholder sentences like "No education details provided."
+- **Omit empty sections entirely**: If the original resume has no data for Education, Certifications, Projects, or any other optional section, do NOT include that section at all — not even with a placeholder or "N/A". A missing section is always better than an empty one.
 - **Markdown only**: Use ##, ###, -, ** for structure. No HTML, no tables, no columns.
 ${audienceBlock}
 ${experienceDepthBlock}
