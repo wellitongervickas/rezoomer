@@ -26,8 +26,9 @@ export type ExtensionMessage =
   | { type: 'EXPORT_PDF'; tailoredResumeId: string }
   | { type: 'SAVE_SETTINGS'; settings: VaultSettings }
   | { type: 'GET_SETTINGS' }
-  | { type: 'SCRAPE_LINKEDIN_JOB' }
-  | { type: 'FILL_EASY_APPLY'; fields: EasyApplyFields };
+  | { type: 'SCRAPE_LINKEDIN_JOB'; url?: string }
+  | { type: 'FILL_EASY_APPLY'; fields: EasyApplyFields }
+  | { type: 'OPEN_IN_TAB' };
 
 export type ExtensionResponse =
   | { success: true; data?: unknown }
@@ -301,34 +302,77 @@ export function createMessageRouter(
       // ----------------------------------------------------------------
       case 'SCRAPE_LINKEDIN_JOB': {
         try {
-          const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
-          if (!tab?.id) {
-            throw new AppError('VALIDATION_ERROR', 'No active tab found.');
+          if (message.url) {
+            if (!message.url.startsWith('https://www.linkedin.com/jobs/view/')) {
+              throw new AppError('LINKEDIN_NOT_JOB_PAGE', 'Navigate to a LinkedIn job listing first.');
+            }
+            const tab = await chrome.tabs.create({ url: message.url, active: false });
+            try {
+              await Promise.race([
+                new Promise<void>((resolve) => {
+                  function listener(tabId: number, changeInfo: chrome.tabs.TabChangeInfo) {
+                    if (tabId === tab.id && changeInfo.status === 'complete') {
+                      chrome.tabs.onUpdated.removeListener(listener);
+                      resolve();
+                    }
+                  }
+                  chrome.tabs.onUpdated.addListener(listener);
+                }),
+                new Promise<never>((_, reject) =>
+                  setTimeout(
+                    () => reject(new AppError('LINKEDIN_SCRAPE_FAILED', 'LinkedIn page timed out.')),
+                    15_000,
+                  ),
+                ),
+              ]);
+              const results = await chrome.scripting.executeScript({
+                target: { tabId: tab.id! },
+                func: scrapeLinkedInJobPage,
+                world: 'MAIN',
+              });
+              const data = results[0]?.result;
+              if (!data?.jobDescription) {
+                throw new AppError(
+                  'LINKEDIN_SCRAPE_FAILED',
+                  'Could not read job details. LinkedIn may have changed its layout.',
+                );
+              }
+              return ok(data);
+            } finally {
+              await chrome.tabs.remove(tab.id!).catch(() => {});
+            }
+          } else {
+            const [tab] = await chrome.tabs.query({ active: true, lastFocusedWindow: true });
+            if (!tab?.id) {
+              throw new AppError('VALIDATION_ERROR', 'No active tab found.');
+            }
+            const url = tab.url ?? '';
+            if (!url.startsWith('https://www.linkedin.com/jobs/view/')) {
+              throw new AppError('LINKEDIN_NOT_JOB_PAGE', 'Navigate to a LinkedIn job listing first.');
+            }
+            const results = await chrome.scripting.executeScript({
+              target: { tabId: tab.id },
+              func: scrapeLinkedInJobPage,
+              world: 'MAIN',
+            });
+            const data = results[0]?.result;
+            if (!data?.jobDescription) {
+              throw new AppError(
+                'LINKEDIN_SCRAPE_FAILED',
+                'Could not read job details. LinkedIn may have changed its layout.',
+              );
+            }
+            return ok(data);
           }
+        } catch (err) {
+          return handleError(err);
+        }
+      }
 
-          const url = tab.url ?? '';
-          if (!url.startsWith('https://www.linkedin.com/jobs/view/')) {
-            throw new AppError(
-              'LINKEDIN_NOT_JOB_PAGE',
-              'Navigate to a LinkedIn job listing first.',
-            );
-          }
-
-          const results = await chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: scrapeLinkedInJobPage,
-            world: 'MAIN',
-          });
-
-          const data = results[0]?.result;
-          if (!data || !data.jobDescription) {
-            throw new AppError(
-              'LINKEDIN_SCRAPE_FAILED',
-              'Could not read job details. LinkedIn may have changed its layout.',
-            );
-          }
-
-          return ok(data);
+      case 'OPEN_IN_TAB': {
+        try {
+          await chrome.tabs.create({ url: chrome.runtime.getURL('src/ui/sidepanel/index.html') });
+          return ok();
         } catch (err) {
           return handleError(err);
         }

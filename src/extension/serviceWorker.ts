@@ -41,6 +41,7 @@ chrome.runtime.onConnect.addListener((port) => {
     jobDescription: string;
     companyName?: string;
     roleTitle?: string;
+    url?: string;
     options?: GenerationOptions;
   }) => {
     await sessionReady;
@@ -73,6 +74,7 @@ chrome.runtime.onConnect.addListener((port) => {
               rawText: msg.jobDescription,
               companyName: msg.companyName,
               roleTitle: msg.roleTitle,
+              url: msg.url,
             },
             content: tailoredContent,
             providerId: defaultProvider.id,

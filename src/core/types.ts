@@ -24,6 +24,7 @@ export interface JobDescription {
   readonly rawText: string;
   readonly companyName?: string;
   readonly roleTitle?: string;
+  readonly url?: string;
 }
 
 export type ResumeAudience = 'ats' | 'hr' | 'both';

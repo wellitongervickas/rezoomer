@@ -157,6 +157,7 @@ function App() {
   const [settings, setSettings] = useState<VaultSettings | null>(null);
   const [generationDefaults, setGenerationDefaults] = useState<GenerationOptions | null>(null);
   const [settingsLoaded, setSettingsLoaded] = useState(false);
+  const [lastImportedUrl, setLastImportedUrl] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (!vault.unlocked || settingsLoaded) return;
@@ -219,7 +220,7 @@ function App() {
     let accumulated = '';
 
     const handle = streamTailorResume(
-      { baseResumeId, jobDescription, companyName: company, roleTitle: role, options },
+      { baseResumeId, jobDescription, companyName: company, roleTitle: role, url: lastImportedUrl, options },
       (event: ResumeAgentEvent) => {
         switch (event.kind) {
           case 'step':
@@ -285,8 +286,18 @@ function App() {
     }
   }
 
-  async function handleImportLinkedIn(): Promise<LinkedInJobData> {
-    return sendMessage<LinkedInJobData>({ type: 'SCRAPE_LINKEDIN_JOB' });
+  async function handleImportLinkedIn(url?: string): Promise<LinkedInJobData> {
+    const data = await sendMessage<LinkedInJobData>({ type: 'SCRAPE_LINKEDIN_JOB', ...(url ? { url } : {}) });
+    setLastImportedUrl(url);
+    return data;
+  }
+
+  async function handleOpenInTab() {
+    try {
+      await sendMessage<void>({ type: 'OPEN_IN_TAB' });
+    } catch {
+      // non-fatal
+    }
   }
 
   async function handleFillEasyApply(resume: TailoredResume): Promise<EasyApplyResult> {
@@ -317,6 +328,14 @@ function App() {
           onClick={() => dispatch({ type: 'SET_TAB', tab: 'settings' })}
         >
           Settings
+        </button>
+        <button
+          type="button"
+          className="tab-bar__icon"
+          title="Open in tab"
+          onClick={handleOpenInTab}
+        >
+          &#x2197;
         </button>
         <button
           type="button"

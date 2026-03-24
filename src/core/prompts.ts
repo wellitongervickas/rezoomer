@@ -77,13 +77,11 @@ AUDIENCE: ATS-Optimized
 Your primary goal is maximum ATS score. Every structural and wording decision must serve keyword coverage and parser compatibility.
 
 MANDATORY section order (do not deviate):
-  1. Contact Information — copy ALL contact fields from the original resume exactly. Format: # Full Name on its own line as an H1 heading, then one pipe-separated line with email, phone, and every URL present (LinkedIn, GitHub, portfolio, etc.). URLs MUST be output as bare text (e.g. linkedin.com/in/johndoe or https://github.com/johndoe). If the original resume has a URL inside a markdown link like [LinkedIn](https://linkedin.com/in/johndoe), extract and output ONLY the URL part — never output the label alone without the URL. Do NOT invent, guess, or omit any contact field that exists in the original resume. (no tables, no columns)
+  1. Contact Information — copy ALL contact fields from the original resume exactly. Format: # Full Name on its own line as an H1 heading, then one pipe-separated line with email, phone, and every URL present (LinkedIn, GitHub, portfolio, etc.). URLs MUST be output as bare text without protocol or www prefix (e.g. linkedin.com/in/johndoe, github.com/johndoe — NOT https://github.com/johndoe, NOT www.linkedin.com/...). If the original resume has a URL inside a markdown link like [LinkedIn](https://linkedin.com/in/johndoe), extract and output ONLY the URL part — never output the label alone without the URL. Do NOT invent, guess, or omit any contact field that exists in the original resume. (no tables, no columns)
   2. Professional Summary
   3. Core Competencies / Technical Skills
   4. Work Experience
-  5. Education (only if present in original)
-  6. Certifications (only if present in original)
-  7. Any other sections from the original (projects, publications, etc.)
+  5. Any remaining sections that have real content in the original resume (e.g. Projects, Languages)
 
 Professional Summary rules:
   - MUST open with the exact job title from the posting (where truthful): "[Title] with [X] years of experience in [domain]."
@@ -117,13 +115,13 @@ AUDIENCE: Human Recruiter (HR)
 Your primary goal is to command attention in a 6-second scan and tell a compelling achievement story. Numbers and impact must be immediately visible.
 
 MANDATORY section order — experience leads for experienced candidates (do not deviate):
-  1. Contact Information — copy ALL contact fields from the original resume exactly. Format: # Full Name on its own line as an H1 heading, then one pipe-separated line with email, phone, and every URL present (LinkedIn, GitHub, portfolio, etc.). URLs MUST be output as bare text (e.g. linkedin.com/in/johndoe or https://github.com/johndoe). If the original resume has a URL inside a markdown link like [LinkedIn](https://linkedin.com/in/johndoe), extract and output ONLY the URL part — never output the label alone without the URL. Do NOT invent, guess, or omit any contact field that exists in the original resume. (no tables, no columns)
+  1. Contact Information — copy ALL contact fields from the original resume exactly. Format: # Full Name on its own line as an H1 heading, then one pipe-separated line with email, phone, and every URL present (LinkedIn, GitHub, portfolio, etc.). URLs MUST be output as bare text without protocol or www prefix (e.g. linkedin.com/in/johndoe, github.com/johndoe — NOT https://github.com/johndoe, NOT www.linkedin.com/...). If the original resume has a URL inside a markdown link like [LinkedIn](https://linkedin.com/in/johndoe), extract and output ONLY the URL part — never output the label alone without the URL. Do NOT invent, guess, or omit any contact field that exists in the original resume. (no tables, no columns)
   2. Professional Summary
   3. Work Experience
   4. Skills / Core Competencies
-  5. Education (only if present in original)
-  6. Certifications (only if present in original)
-  7. Any other sections from the original
+  5. Education — include ONLY if the original resume contains explicit education data (degree, institution, dates). If absent, skip this item completely — do not write "## Education" or any heading for it
+  6. Certifications — include ONLY if the original resume contains explicit certifications. If absent, skip this item completely — do not write "## Certifications" or any heading for it
+  7. Any other sections present in the original — omit entirely if absent
 
 Professional Summary rules:
   - Achievement-first opening — NEVER "seeking a role" or "looking to leverage":
@@ -153,13 +151,13 @@ AUDIENCE: ATS + Human Recruiter (Balanced — default)
 Satisfy both: pass the ATS keyword scan first, then compel the human reader. These are not in conflict — keywords embedded in achievement statements serve both.
 
 MANDATORY section order (works for both ATS and HR — do not deviate):
-  1. Contact Information — copy ALL contact fields from the original resume exactly. Format: # Full Name on its own line as an H1 heading, then one pipe-separated line with email, phone, and every URL present (LinkedIn, GitHub, portfolio, etc.). URLs MUST be output as bare text (e.g. linkedin.com/in/johndoe or https://github.com/johndoe). If the original resume has a URL inside a markdown link like [LinkedIn](https://linkedin.com/in/johndoe), extract and output ONLY the URL part — never output the label alone without the URL. Do NOT invent, guess, or omit any contact field that exists in the original resume. (no tables, no columns)
+  1. Contact Information — copy ALL contact fields from the original resume exactly. Format: # Full Name on its own line as an H1 heading, then one pipe-separated line with email, phone, and every URL present (LinkedIn, GitHub, portfolio, etc.). URLs MUST be output as bare text without protocol or www prefix (e.g. linkedin.com/in/johndoe, github.com/johndoe — NOT https://github.com/johndoe, NOT www.linkedin.com/...). If the original resume has a URL inside a markdown link like [LinkedIn](https://linkedin.com/in/johndoe), extract and output ONLY the URL part — never output the label alone without the URL. Do NOT invent, guess, or omit any contact field that exists in the original resume. (no tables, no columns)
   2. Professional Summary
   3. Core Competencies / Technical Skills
   4. Work Experience
-  5. Education (only if present in original)
-  6. Certifications (only if present in original)
-  7. Any other sections from the original
+  5. Education — include ONLY if the original resume contains explicit education data (degree, institution, dates). If absent, skip this item completely — do not write "## Education" or any heading for it
+  6. Certifications — include ONLY if the original resume contains explicit certifications. If absent, skip this item completely — do not write "## Certifications" or any heading for it
+  7. Any other sections present in the original — omit entirely if absent
 
 Professional Summary rules:
   - Achievement-first AND keyword-rich: "[Job title from posting] with [X years] in [domain] who [achievement + metric]."
@@ -251,8 +249,12 @@ CRITICAL RULES — follow without exception
     ✗ "No certifications provided"
     ✗ "No education information available"
     ✗ "N/A"
-    ✗ Any section heading followed by nothing or a placeholder sentence
-  A section that cannot be filled with real data from the original resume must be completely absent from the output.
+    ✗ "[Education details if present in the original resume]"
+    ✗ "[Certification details if present in the original resume]"
+    ✗ Any text in square brackets used as a placeholder
+    ✗ A section heading (e.g. "## Education" or "## Certifications") with no real content beneath it
+    ✗ Any section heading followed by nothing, a blank line, or a placeholder sentence
+  A section that cannot be filled with real data from the original resume must be completely absent from the output — no heading, no blank line, nothing.
 - **Never fabricate**: Do not invent any experience, skill, project, title, date, or achievement not present in the original resume. Violations destroy candidate credibility.
 - **Reframe, don't invent**: Rephrase and reorder existing content to emphasise relevance. Incorporate job-relevant keywords only where they accurately describe existing work.
 - **Preserve all facts**: Dates, company names, job titles, and measurable achievements must remain accurate to the original.

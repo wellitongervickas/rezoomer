@@ -18,7 +18,7 @@ interface Props {
   isGenerating: boolean;
   initialOptions: GenerationOptions;
   onOptionsChange?: (options: GenerationOptions) => void;
-  onImportLinkedIn?: () => Promise<LinkedInJobData>;
+  onImportLinkedIn?: (url?: string) => Promise<LinkedInJobData>;
 }
 
 export function JobDescriptionInput({
@@ -52,6 +52,7 @@ export function JobDescriptionInput({
   const [rules, setRules] = useState(initialOptions.rules);
   const [loadingResumes, setLoadingResumes] = useState(true);
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [linkedInUrl, setLinkedInUrl] = useState("");
   const [isImporting, setIsImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
   const mountedRef = useRef(false);
@@ -126,12 +127,12 @@ export function JobDescriptionInput({
     setIsImporting(true);
     setImportError(null);
     try {
-      const data = await onImportLinkedIn();
+      const data = await onImportLinkedIn(linkedInUrl.trim() || undefined);
       setJobDescription(data.jobDescription);
       setCompany(data.companyName);
       setRole(data.jobTitle);
     } catch (err) {
-      setImportError(err instanceof Error ? err.message : 'Import failed');
+      setImportError(err instanceof Error ? err.message : "Import failed");
     } finally {
       setIsImporting(false);
     }
@@ -237,7 +238,6 @@ export function JobDescriptionInput({
                 id="max-experiences-input"
                 type="number"
                 min={1}
-                max={6}
                 className="form-input form-input--sm"
                 placeholder="3"
                 value={maxKeyExperiences}
@@ -341,6 +341,27 @@ export function JobDescriptionInput({
         />
       </div>
 
+      {onImportLinkedIn && (
+        <div className="form-group">
+          <label className="form-label" htmlFor="linkedin-url-input">
+            LinkedIn Job URL <span className="form-optional">(optional)</span>
+          </label>
+          <input
+            id="linkedin-url-input"
+            type="url"
+            className="form-input"
+            placeholder="https://www.linkedin.com/jobs/view/…"
+            value={linkedInUrl}
+            onChange={(e) => setLinkedInUrl(e.target.value)}
+            disabled={isImporting || isGenerating}
+          />
+          <p className="form-hint">
+            Paste a LinkedIn job URL, or leave blank to import from the active
+            tab.
+          </p>
+        </div>
+      )}
+
       <div className="form-group">
         <div className="form-label-row">
           <label className="form-label" htmlFor="jd-textarea">
@@ -353,7 +374,7 @@ export function JobDescriptionInput({
               onClick={handleImportLinkedIn}
               disabled={isImporting || isGenerating}
             >
-              {isImporting ? 'Importing…' : 'Import from LinkedIn'}
+              {isImporting ? "Importing…" : "Import from LinkedIn"}
             </button>
           )}
         </div>

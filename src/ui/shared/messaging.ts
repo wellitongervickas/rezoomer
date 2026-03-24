@@ -13,8 +13,9 @@ export type ExtensionMessage =
   | { type: 'TAILOR_RESUME'; baseResumeId: string; jobDescription: string }
   | { type: 'LIST_TAILORED'; page: number; pageSize: number }
   | { type: 'EXPORT_PDF'; tailoredResumeId: string }
-  | { type: 'SCRAPE_LINKEDIN_JOB' }
-  | { type: 'FILL_EASY_APPLY'; fields: EasyApplyFields };
+  | { type: 'SCRAPE_LINKEDIN_JOB'; url?: string }
+  | { type: 'FILL_EASY_APPLY'; fields: EasyApplyFields }
+  | { type: 'OPEN_IN_TAB' };
 
 export type ExtensionResponse<T = unknown> =
   | { success: true; data: T }
@@ -44,6 +45,7 @@ export function streamTailorResume(
     jobDescription: string;
     companyName?: string;
     roleTitle?: string;
+    url?: string;
     options?: GenerationOptions;
   },
   onEvent: (event: ResumeAgentEvent) => void,
